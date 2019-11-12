@@ -34,6 +34,7 @@ set hlsearch
 set ignorecase
 set smartcase
 set hidden
+set scrolloff=3
 " Fix colors
 set termguicolors
 set t_8f=[38;2;%lu;%lu;%lum
