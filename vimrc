@@ -19,6 +19,8 @@ Plug 'tpope/vim-commentary'
 Plug 'sheerun/vim-polyglot'
 Plug 'srcery-colors/srcery-vim'
 Plug 'christophermca/meta5'
+Plug 'justinmk/vim-sneak'
+Plug 'psliwka/vim-smoothie'
 call plug#end()
 
 colorscheme meta5
@@ -30,15 +32,30 @@ set ruler
 set cursorline
 set showcmd
 set incsearch
-set hlsearch
 set ignorecase
 set smartcase
 set hidden
+set wildmenu
 set scrolloff=3
+filetype plugin indent on
+syntax on
 " Fix colors
 set termguicolors
 set t_8f=[38;2;%lu;%lu;%lum
 set t_8b=[48;2;%lu;%lu;%lum
 
-filetype plugin indent on
-syntax on
+let mapleader = "\<Space>"
+nnoremap <Leader>R :!ranger<CR><CR>
+nnoremap <Leader>b :ls<CR>:buffer<Space>
+nnoremap <Leader>B :ls<CR>:sbuffer<Space>
+nnoremap <Right> :bn<CR>
+nnoremap <Left> :bN<CR>
+nnoremap <Leader>d :bd<CR>
+nnoremap <Leader>. :e ~/.vimrc<CR>
+
+autocmd BufWritePost .vimrc source %
+autocmd FileType python nnoremap <buffer> <Leader>r :w<CR>:!clear;python %<CR>
+autocmd FileType javascript nnoremap <buffer> <Leader>r :w<CR>:!clear;node %<CR>
+autocmd FileType c nnoremap <buffer> <Leader>r :w<CR>:!clear;gcc -o %.out -Wall % && ./%.out<CR>
+autocmd FileType java nnoremap <buffer> <Leader>r :w<CR>:!clear;javac % && java %<CR>
+autocmd FileType sh nnoremap <buffer> <Leader>r :w<CR>:!clear;./%<CR>
