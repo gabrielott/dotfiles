@@ -16,6 +16,7 @@ call plug#begin('~/.vim/plugged')
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-apathy'
 Plug 'sheerun/vim-polyglot'
 Plug 'christophermca/meta5'
 Plug 'psliwka/vim-smoothie'
@@ -46,6 +47,7 @@ let mapleader = "\<Space>"
 nnoremap <Leader>R :!ranger<CR><CR>
 nnoremap <Leader>b :ls<CR>:buffer<Space>
 nnoremap <Leader>B :ls<CR>:sbuffer<Space>
+nnoremap <Leader>e :e **/*
 nnoremap <Right> :bn<CR>
 nnoremap <Left> :bN<CR>
 nnoremap <Leader>d :bd<CR>
