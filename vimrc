@@ -17,9 +17,7 @@ Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-commentary'
 Plug 'sheerun/vim-polyglot'
-Plug 'srcery-colors/srcery-vim'
 Plug 'christophermca/meta5'
-Plug 'justinmk/vim-sneak'
 Plug 'psliwka/vim-smoothie'
 call plug#end()
 
