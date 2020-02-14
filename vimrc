@@ -1,4 +1,4 @@
-"        _
+
 " __   _(_)_ __ ___  _ __ ___
 " \ \ / / | '_ ` _ \| '__/ __|
 "  \ V /| | | | | | | | | (__
@@ -53,9 +53,18 @@ nnoremap <Left> :bN<CR>
 nnoremap <Leader>d :bd<CR>
 nnoremap <Leader>. :e ~/.vimrc<CR>
 
+" System-wide clipboard
+nnoremap <Leader>Y "+yy
+nnoremap <Leader>y "+y
+vnoremap <Leader>y "+y
+nnoremap <Leader>p "+p
+vnoremap <Leader>p "+p
+nnoremap <Leader>P "+P
+
 autocmd BufWritePost .vimrc source %
 autocmd FileType python nnoremap <buffer> <Leader>r :w<CR>:!clear;python %<CR>
 autocmd FileType javascript nnoremap <buffer> <Leader>r :w<CR>:!clear;node %<CR>
 autocmd FileType c nnoremap <buffer> <Leader>r :w<CR>:!clear;gcc -o %.out -Wall % && ./%.out<CR>
 autocmd FileType java nnoremap <buffer> <Leader>r :w<CR>:!clear;javac % && java %:r<CR>
 autocmd FileType sh nnoremap <buffer> <Leader>r :w<CR>:!clear;./%<CR>
+autocmd FileType scheme nnoremap <buffer> <Leader>r :w<CR>:!clear;scheme < %<CR>
