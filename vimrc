@@ -1,9 +1,7 @@
-
 " __   _(_)_ __ ___  _ __ ___
 " \ \ / / | '_ ` _ \| '__/ __|
 "  \ V /| | | | | | | | | (__
 "   \_/ |_|_| |_| |_|_|  \___|
-"
 
 " Autoinstall vim-plug
 if empty(glob('~/.vim/autoload/plug.vim'))
@@ -18,9 +16,11 @@ Plug 'tpope/vim-surround'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-apathy'
 Plug 'sheerun/vim-polyglot'
-Plug 'christophermca/meta5'
 Plug 'psliwka/vim-smoothie'
+Plug 'jiangmiao/auto-pairs'
+Plug 'christophermca/meta5'
 call plug#end()
+let g:AutoPairsFlyMode = 1
 
 colorscheme meta5
 set encoding=utf-8
@@ -44,14 +44,19 @@ set t_8f=[38;2;%lu;%lu;%lum
 set t_8b=[48;2;%lu;%lu;%lum
 
 let mapleader = "\<Space>"
-nnoremap <Leader>R :!ranger<CR><CR>
+" Buffer management
 nnoremap <Leader>b :ls<CR>:buffer<Space>
 nnoremap <Leader>B :ls<CR>:sbuffer<Space>
 nnoremap <Leader>e :e **/*
 nnoremap <Right> :bn<CR>
 nnoremap <Left> :bN<CR>
 nnoremap <Leader>d :bd<CR>
-nnoremap <Leader>. :e ~/.vimrc<CR>
+
+" Add new line above or below
+nnoremap <silent> <Plug>NewLineBelow mzo<Esc>`z:call repeat#set("\<Plug>NewLineBelow")<CR>
+nmap <Leader>s <Plug>NewLineBelow
+nnoremap <silent> <Plug>NewLineAbove mzO<Esc>`z:call repeat#set("\<Plug>NewLineAbove")<CR>
+nmap <Leader>S <Plug>NewLineAbove
 
 " System-wide clipboard
 nnoremap <Leader>Y "+yy
@@ -60,6 +65,14 @@ vnoremap <Leader>y "+y
 nnoremap <Leader>p "+p
 vnoremap <Leader>p "+p
 nnoremap <Leader>P "+P
+
+nnoremap <M-a> ateste<Esc>
+
+" Miscellaneous
+nnoremap <Leader>. :e ~/.vimrc<CR>     " Open this file
+nnoremap <Leader>R :!ranger<CR><CR>    " Run ranger
+nnoremap <Leader>= mzgg=G`z            " Auto indent entire file
+cnoremap w!! w !sudo tee > /dev/null % " Save with sudo
 
 autocmd BufWritePost .vimrc source %
 autocmd FileType python nnoremap <buffer> <Leader>r :w<CR>:!clear;python %<CR>
