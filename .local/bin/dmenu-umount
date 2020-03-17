@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# Lists all removable mounted devices and lets the user
+# umount one of them.
+# Needs to be able to run umount as root.
+
+options=$(lsblk -pl | awk '/ 1 .*part \// {print $1, "("$4")"}')
+if [ -z "$options" ]; then
+	echo "Nothing to umount" | dmenu > /dev/null
+	exit 1;
+fi
+
+device=$(echo "$options" | dmenu -i -p 'Choose device' | cut -d ' ' -f 1)
+[ -z "$device" ] && exit 1
+
+sudo umount "$device"

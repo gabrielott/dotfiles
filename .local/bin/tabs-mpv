@@ -1,0 +1,25 @@
+#!/bin/sh
+
+# Lists all tabs currently open in firefox which likely contain video, lets
+# the user pick one (if more than one is available) and opens it with mpv.
+# All arguments are passed to mpv.
+
+# If the script is already running, kill it and exit
+pid="$(pidof -o '%PPID' -x "$0")"
+[ -n "$pid" ] && kill "$pid" && exit 0
+
+options="$(firetabs | grep 'video\|watch')"
+[ -z "$options" ] && exit 1
+
+if [ "$(echo "$options" | wc -l)" -gt 1 ]; then
+	selected="$(echo "$options" | dmenu -i -p 'Choose tab:' -l 10 | cut -f2)"
+	[ -z "$selected" ] && exit 1
+else
+	selected="$(echo "$options" | cut -f2)"
+fi
+
+# Kill mpv when the script exits
+kill_mpv() { kill "$!"; }
+trap kill_mpv EXIT
+mpv "$@" "$selected" &
+wait "$!"

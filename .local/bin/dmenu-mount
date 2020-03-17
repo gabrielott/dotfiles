@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# Lists all removable not mounted devices and lets the user
+# pick a directory in /mnt to mount one of them.
+# Needs to be able to run mount as root.
+
+options=$(lsblk -pl | awk '/ 1 .*part $/ {print $1, "("$4")"}')
+if [ -z "$options" ]; then
+	echo "Nothing to mount" | dmenu > /dev/null
+	exit 1;
+fi
+
+device=$(echo "$options" | dmenu -i -p 'Choose device' | cut -d ' ' -f 1)
+[ -z "$device" ] && exit 1
+
+mountpoint=$(find /mnt -type d -empty | dmenu -i -p 'Choose mountpoint')
+[ -z "$mountpoint" ] && exit 1
+
+sudo mount -o umask=000 "$device" "$mountpoint"

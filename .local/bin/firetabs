@@ -1,0 +1,18 @@
+#!/bin/python3
+
+# Prints the titles and urls of all tabs currently open in firefox to stdout.
+
+import json, subprocess, lz4.block
+path = subprocess.check_output('sh -c "echo ~/.mozilla/firefox/*default-release*/sessionstore-backups/recovery.jsonlz4"', shell=True).rstrip()
+
+f = open(path, "rb")
+f.read(8)
+jdata = json.loads(lz4.block.decompress(f.read()).decode("utf-8"))
+f.close()
+
+for win in jdata.get("windows"):
+    for tab in win.get("tabs"):
+        i = int(tab.get("index")) - 1
+        url = tab.get("entries")[i].get("url")
+        title = tab.get("entries")[i].get("title")
+        print(f"{title}	{url}")
