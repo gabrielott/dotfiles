@@ -18,11 +18,12 @@ Plug 'tpope/vim-apathy'
 Plug 'sheerun/vim-polyglot'
 Plug 'psliwka/vim-smoothie'
 Plug 'jiangmiao/auto-pairs'
-Plug 'christophermca/meta5'
+Plug 'arzg/vim-colors-xcode'
 call plug#end()
-let g:AutoPairsFlyMode = 1
 
-colorscheme meta5
+let g:AutoPairsFlyMode = 1
+let g:AutoPairsShortcutBackInsert = '<C-b>'
+
 set encoding=utf-8
 set fileencodings=ucs-bom,uft-8,default,sjis
 set number
@@ -42,6 +43,7 @@ syntax on
 set termguicolors
 set t_8f=[38;2;%lu;%lu;%lum
 set t_8b=[48;2;%lu;%lu;%lum
+colorscheme xcodedarkhc
 
 let mapleader = "\<Space>"
 " Buffer management
@@ -66,13 +68,11 @@ nnoremap <Leader>p "+p
 vnoremap <Leader>p "+p
 nnoremap <Leader>P "+P
 
-nnoremap <M-a> ateste<Esc>
-
 " Miscellaneous
 nnoremap <Leader>. :e ~/.vimrc<CR>     " Open this file
-nnoremap <Leader>R :!ranger<CR><CR>    " Run ranger
+nnoremap <Leader>R :!lf<CR><CR>        " Run lf
 nnoremap <Leader>= mzgg=G`z            " Auto indent entire file
-cnoremap w!! w !sudo tee > /dev/null % " Save with sudo
+cnoremap w!! w !sudo tee > /dev/null %
 
 autocmd BufWritePost .vimrc source %
 autocmd FileType python nnoremap <buffer> <Leader>r :w<CR>:!clear;python %<CR>
