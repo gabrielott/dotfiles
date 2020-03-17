@@ -1,0 +1,7 @@
+xrandr --output DP-4 --auto --output DVI-D-0 --scale 2x2 --right-of DP-4
+
+fcitx &
+sxhkd &
+compton &
+polybar -r mybar &
+wal -R &
