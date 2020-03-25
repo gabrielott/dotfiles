@@ -77,7 +77,7 @@ cnoremap w!! w !sudo tee > /dev/null %
 autocmd BufWritePost .vimrc source %
 autocmd FileType python nnoremap <buffer> <Leader>r :w<CR>:!clear;python %<CR>
 autocmd FileType javascript nnoremap <buffer> <Leader>r :w<CR>:!clear;node %<CR>
-autocmd FileType c nnoremap <buffer> <Leader>r :w<CR>:!clear;gcc -o %.out -Wall % && ./%.out<CR>
+autocmd FileType c nnoremap <buffer> <Leader>r :w<CR>:!clear;gcc -o %.out -Wall -Wextra -std=c11 -pedantic % && ./%.out<CR>
 autocmd FileType java nnoremap <buffer> <Leader>r :w<CR>:!clear;javac % && java %:r<CR>
 autocmd FileType sh nnoremap <buffer> <Leader>r :w<CR>:!clear;./%<CR>
 autocmd FileType scheme nnoremap <buffer> <Leader>r :w<CR>:!clear;scheme < %<CR>
