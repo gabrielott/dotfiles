@@ -5,3 +5,4 @@ sxhkd &
 compton &
 polybar -r mybar &
 wal -R &
+[ ! -s ~/stuff2/mpd/pid ] && mpd
