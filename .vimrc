@@ -75,9 +75,18 @@ nnoremap <Leader>= mzgg=G`z            " Auto indent entire file
 cnoremap w!! w !sudo tee > /dev/null %
 
 autocmd BufWritePost .vimrc source %
+
+" Compile and/or run
 autocmd FileType python nnoremap <buffer> <Leader>r :w<CR>:!clear;python %<CR>
 autocmd FileType javascript nnoremap <buffer> <Leader>r :w<CR>:!clear;node %<CR>
-autocmd FileType c nnoremap <buffer> <Leader>r :w<CR>:!clear;gcc -o %.out -Wall -Wextra -std=c11 -pedantic % && ./%.out<CR>
+autocmd FileType c nnoremap <buffer> <Leader>r :w<CR>:!clear;gcc -o %:r.out -Wall -Wextra -std=c11 -pedantic % && ./%:r.out<CR>
 autocmd FileType java nnoremap <buffer> <Leader>r :w<CR>:!clear;javac % && java %:r<CR>
 autocmd FileType sh nnoremap <buffer> <Leader>r :w<CR>:!clear;./%<CR>
 autocmd FileType scheme nnoremap <buffer> <Leader>r :w<CR>:!clear;scheme < %<CR>
+
+" Compile
+autocmd FileType c nnoremap <buffer> <Leader>c :w<CR>:!gcc -o %:r.out -Wall -Wextra -std=c11 -pedantic %<CR><CR>
+autocmd FileType java nnoremap <buffer> <Leader>c :w<CR>:!javac %<CR><CR>
+
+" Compile to assembly and show result in new split
+autocmd FileType c nnoremap <buffer> <Leader>C :w<CR>:!gcc -o %:r.s -Wall -Wextra -std=c11 -pedantic -O1 -m32 -S %<CR><CR>:split %:r.s<CR>:e<CR>
