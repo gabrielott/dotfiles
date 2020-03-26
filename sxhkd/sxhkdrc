@@ -19,7 +19,9 @@ super + {_,shift} + v
 	pactl set-sink-volume alsa_output.pci-0000_0d_00.3.analog-stereo -{5,1,10}%
 XF86AudioMute
 	pactl set-sink-mute alsa_output.pci-0000_0d_00.3.analog-stereo toggle
-super + shift + s
+@Print
+	scrot -s
+shift + Print
 	scrot -u
 
 # bspwm
