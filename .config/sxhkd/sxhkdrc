@@ -17,8 +17,26 @@ super + {_,shift} + v
 	pactl set-sink-volume alsa_output.pci-0000_0d_00.3.analog-stereo +{5,1,10}%
 {_,control,shift} + XF86AudioLowerVolume
 	pactl set-sink-volume alsa_output.pci-0000_0d_00.3.analog-stereo -{5,1,10}%
+super + {_,control,shift} + XF86AudioRaiseVolume
+	mpc volume +{5,1,10}
+super + {_,control,shift} + XF86AudioLowerVolume
+	mpc volume -{5,1,10}
 XF86AudioMute
 	pactl set-sink-mute alsa_output.pci-0000_0d_00.3.analog-stereo toggle
+super + XF86AudioMute
+	mpc seek 0
+XF86Audio{Prev,Next}
+	mpc {prev,next}
+super + {_,control,shift} XF86AudioPrev
+	mpc seek -{10,5,30}
+super + {_,control,shift} XF86AudioNext
+	mpc seek +{10,5,30}
+{_,shift} + XF86AudioPlay
+	mpc {toggle,stop}
+control + XF86AudioPlay
+	dmenu -p 'Enter time to seek to' | xargs mpc seek
+super + XF86AudioPlay
+	mpc listall | dmenu -l 10 -i -p 'Pick song' | xargs -d '\n' mpc insert; mpc next
 @Print
 	scrot -s
 shift + Print
@@ -40,11 +58,11 @@ super + g; {h,m,l,s,p}
 	bspc node -g {hidden,marked,locked,sticky,private}
 super + g; shift + h
 	bspc node any.hidden -g hidden
-super + {_,shift +} {h,j,k,l}
+super + {_,shift} + {h,j,k,l}
 	bspc node -{f,s} {west,south,north,east}
 super + {p,b,comma,period}
 	bspc node -f @{parent,brother,first,second}
-super + {_,shift +} n
+super + {_,shift} + n
 	bspc node -f {next,prev}.local
 super + {grave,Tab}
 	bspc {node,desktop} -f last
@@ -52,9 +70,9 @@ super + {o,i}
 	bspc wm -h off; \
 	bspc node {older,newer} -f; \
 	bspc wm -h on
-super + {_,shift +} {1-9,0}
+super + {_,shift} + {1-9,0}
 	bspc {desktop -f,node -d} focused:^{1-9,10}
-super + {_,shift +} backslash
+super + {_,shift} + backslash
 	bspc {desktop -f,node -d} last:focused
 super + control + {h,j,k,l,space}
 	bspc node -p {west,south,north,east,cancel}
