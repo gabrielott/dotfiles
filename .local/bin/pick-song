@@ -1,0 +1,44 @@
+#!/bin/sh
+
+# Lists songs/albums with fzf, lets the user pick one
+# and adds what was chosen next to the currently playing
+# song on mpd's queue.
+#
+# -q lists the current queue and plays the chosen song
+# without adding it again to the queue. 
+# -b lists all albums and adds all songs from the chosen
+# one to the queue.
+# Any other arguments or the lack of thereof lists all
+# songs and adds the chosen one to the queue.
+
+ask() {
+	selected="$(echo "$1" | fzf)"
+	[ -z "$selected" ] && exit 1
+}
+
+findinsert() {
+	mpc find "$@" | xargs -d '\n' mpc insert
+}
+
+case "$1" in
+	'-q')
+		ask "$(mpc -f '%artist%	%title%' playlist)"
+		artist="$(echo "$selected" | cut -f1)"
+		title="$(echo "$selected" | cut -f2)"
+		mpc searchplay artist "$artist" title "$title"
+		;;
+	'-b')
+		ask "$(mpc -f '%artist%	%album%' listall | sort -u)"
+		artist="$(echo "$selected" | cut -f1)"
+		album="$(echo "$selected" | cut -f2)"
+		findinsert artist "$artist" album "$album"
+		mpc searchplay artist "$artist" album "$album"
+		;;
+	*)
+		ask "$(mpc -f '%artist%	%title%' listall)"
+		artist="$(echo "$selected" | cut -f1)"
+		title="$(echo "$selected" | cut -f2)"
+		findinsert artist "$artist" title "$title"
+		mpc searchplay artist "$artist" title "$title"
+		;;
+esac

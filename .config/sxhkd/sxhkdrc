@@ -35,8 +35,8 @@ super + {_,control,shift} XF86AudioNext
 	mpc {toggle,stop}
 control + XF86AudioPlay
 	dmenu -p 'Enter time to seek to' | xargs mpc seek
-super + XF86AudioPlay
-	mpc listall | dmenu -l 10 -i -p 'Pick song' | xargs -d '\n' mpc insert; mpc next
+super + {_,control,shift} + XF86AudioPlay
+	$TERMINAL -c 'pick-song' -e pick-song {_,-q,-b}
 @Print
 	scrot -s
 shift + Print

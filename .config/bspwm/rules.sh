@@ -20,4 +20,5 @@ case "$class" in
 		case "$(xprop -id "$id" WM_NAME | cut -d'"' -f2)" in
 			'qBittorrent v'*) echo 'desktop=DVI-D-0:^2 locked=on' ;;
 		esac ;;
+	'pick-song') echo 'state=floating' ;;
 esac
