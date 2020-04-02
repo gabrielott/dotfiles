@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Converts every file it receives as an argument to mp3 CBR 320k concurrently.
+# Files can also be sent via stdin.
+
+parallel -k --bar ffmpeg -i '{}' -c:a libmp3lame -b:a 320k '{.}.mp3' ::: "$@"

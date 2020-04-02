@@ -1,0 +1,28 @@
+#!/bin/python3
+
+# Renames all files given as arguments to "track#-title.ext".
+# The track and title data is extracted from the files' id3 tags.
+
+import sys, os
+from mutagen.id3 import ID3
+
+for file in sys.argv[1:]:
+    if not os.path.isfile(file):
+        print(f"Invalid path: {file}")
+        exit(1)
+
+    id3 = ID3(file)
+
+    title = str(id3.get("TIT2", "NO_TITLE"))
+    if "/" in title:
+        title = title.replace("/", "_")
+
+    try:
+        track = int(str(id3.get("TRCK", "NO_TRACK")))
+    except ValueError:
+        print(f"Track tag is not a number: {file}")
+        continue
+
+    dirname = os.path.dirname(file)
+    extension = os.path.splitext(file)[1]
+    os.rename(file, os.path.join(dirname, f"{track:02}-{title}{extension}"))
