@@ -8,9 +8,6 @@ super + c
 	killall compton || compton
 super + Escape
 	pkill -USR1 -x sxhkd
-super + shift + b
-	{polybar-msg cmd hide; bspc config -m DP-4 top_padding 0 ,\
-	polybar-msg cmd show; bspc config -m DP-4 top_padding 35}
 super + {_,shift} + v
 	tabs-mpv {_,--no-video}
 {_,control,shift} + XF86AudioRaiseVolume
@@ -80,3 +77,10 @@ super + control + {1-9}
 	bspc node -o 0.{1-9}
 super + alt + {h,j,k,l}
 	bspc node -z {left -40 0,bottom 0 40,top 0 -40,right 40 0}
+super + F1
+	{polybar-msg cmd hide; bspc config -m DP-4 top_padding 0 ,\
+	polybar-msg cmd show; bspc config -m DP-4 top_padding 35}
+super + {F2,F3}
+	bspc config -m DP-4 window_gap $(($(bspc config -m DP-4 window_gap) {-,+} 5))
+super + shift + {F2,F3}
+	bspc config -m DP-4 window_gap {0,30}
