@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# Extracts a zip file to a cache directory if it's not already
+# there and opens the extracted images with sxiv.
+
+dir=~/.cache/cbz/"$1"
+
+if [ ! -d "$dir" ]; then
+	mkdir -p "$dir"
+	unzip -q -d "$dir" "$1"
+fi
+
+exec sxiv -a "$dir"/*
