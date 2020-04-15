@@ -20,6 +20,6 @@ fi
 
 # Kill mpv when the script exits
 kill_mpv() { kill "$!"; }
-trap kill_mpv EXIT
+trap kill_mpv TERM
 mpv "$@" "$selected" &
 wait "$!"
