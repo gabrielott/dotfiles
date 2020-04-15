@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# This script is meant to be run as a cronjob once a week. It
+# deletes some cache files created by other scripts.
+
+# delete cbz caches created at least a week ago
+find "$HOME"/.cache/cbz -depth -type d '(' -links 2 -ctime +6 ')' -o '(' -empty ')' -exec rm -r {} ';'
+
+# delete sxiv orphaned thumbnail cache files
+sxiv -c
+find "$HOME"/.cache/sxiv/ -depth -type d -empty ! -name 'sxiv' -exec rmdir {} ';'

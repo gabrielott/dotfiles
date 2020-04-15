@@ -1,0 +1,46 @@
+#!/bin/python3
+
+# Scrapes a voice work's info from dlsite and prints it to stdout.
+
+import sys
+
+if len(sys.argv) != 2:
+    print("Usage: koeinfo [RJ]rj_code")
+    exit(1)
+
+import requests, re
+from bs4 import BeautifulSoup
+
+id = sys.argv[1].upper()
+if not id.startswith("RJ"):
+    id = "RJ" + id
+
+url = f"https://www.dlsite.com/maniax/work/=/product_id/{id}.html"
+soup = BeautifulSoup(requests.get(url).content, "html.parser")
+
+if soup.find(string="この番号に対応する作品が見つかりませんでした。"):
+    print("This RJ code doesn't seem to exist.")
+    exit(1)
+
+title = soup.find("h1", id="work_name").a.text.strip()
+cover = "https:" + soup.find("ul", class_="slider_items trans").li.img["src"]
+circle = soup.find("table", id="work_maker").tr.td.span.a.text.strip()
+
+outline = soup.find("table", id="work_outline")
+release_date = outline.find("th", string="販売日").parent.td.a.text.strip()
+illustrator = outline.find("th", string="イラスト").parent.td.a.text.strip()
+seiyuu = (x.text.strip() for x in outline.find("th", string="声優").parent.td.find_all("a"))
+nsfw = outline.find("th", string="年齢指定").parent.span.text.strip() == "18禁"
+genres = (x.text.strip() for x in outline.find("th", string="ジャンル").parent.div.find_all("a"))
+filesize = outline.find("th", string="ファイル容量").parent.div.text.strip()[3:]
+
+print(f"Code: {id}")
+print(f"Title: {title}")
+print(f"Cover: {cover}")
+print(f"Circle: {circle}")
+print(f"Date: {re.sub('[^0-9]', '-', release_date.split('日')[0])}")
+print(f"Seiyuu: {' '.join(x for x in seiyuu)}")
+print(f"Illustrator: {illustrator}")
+print(f"Genres: {' '.join(x for x in genres)}")
+print(f"NSFW: {'Yes' if nsfw else 'No'}")
+print(f"Filesize: {filesize}")

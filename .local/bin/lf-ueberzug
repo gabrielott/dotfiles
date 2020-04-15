@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# Creates a temporary named pipe used to send commands to ueberzug and
+# starts lf. Deletes the pipe before exiting.
+
+export FIFO_UEBERZUG="$(mktemp -u --tmpdir lf-fifo-XXXXXXXXXX)"
+
+cleanup() {
+	rm "$FIFO_UEBERZUG"
+	find /tmp -maxdepth 1 -regex '.*/lf-.*-thumb.*' -exec rm {} +
+	pkill -P "$$"
+}
+
+mkfifo "$FIFO_UEBERZUG"
+tail -f "$FIFO_UEBERZUG" | ueberzug layer &
+trap cleanup EXIT
+
+lf

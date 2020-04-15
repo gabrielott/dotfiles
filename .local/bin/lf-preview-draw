@@ -1,0 +1,37 @@
+#!/bin/sh
+
+# Draws an image preview on the preview field of lf using
+# ueberzug. First argument should be 'add' or 'remove' and
+# the second one should be the path to the image in the case
+# of 'add'. This is meant to be called by lf's preview script
+# after lf was started using the lf-ueberzug script. If that's
+# not the case, it should do nothing unsuccessfully.
+
+[ -z "$FIFO_UEBERZUG" ] && exit 1
+
+action="$1"
+path="$2"
+
+width=$(($(tput cols) / 2))
+height=$(($(tput lines) - 2))
+
+if [ "$action" = 'add' ]; then
+	cat <<- EOF > "$FIFO_UEBERZUG"
+		{ \
+			"action": "add", \
+			"identifier": "preview", \
+			"x": $width, \
+			"y": 1, \
+			"width": $width, \
+			"height": $height, \
+			"path": "$path" \
+		}
+		EOF
+elif [ "$1" = 'remove' ]; then
+	cat <<- EOF > "$FIFO_UEBERZUG"
+		{ \
+			"action": "remove", \
+			"identifier": "preview" \
+		}
+		EOF
+fi
