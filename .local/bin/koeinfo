@@ -28,7 +28,8 @@ circle = soup.find("table", id="work_maker").tr.td.span.a.text.strip()
 
 outline = soup.find("table", id="work_outline")
 release_date = outline.find("th", string="販売日").parent.td.a.text.strip()
-illustrator = outline.find("th", string="イラスト").parent.td.a.text.strip()
+find_illustrator = outline.find("th", string="イラスト")
+illustrator = find_illustrator.parent.td.a.text.strip() if find_illustrator else "NULL"
 seiyuu = (x.text.strip() for x in outline.find("th", string="声優").parent.td.find_all("a"))
 nsfw = outline.find("th", string="年齢指定").parent.span.text.strip() == "18禁"
 genres = (x.text.strip() for x in outline.find("th", string="ジャンル").parent.div.find_all("a"))

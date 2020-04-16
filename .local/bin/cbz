@@ -10,4 +10,4 @@ if [ ! -d "$dir" ]; then
 	unzip -q -d "$dir" "$1"
 fi
 
-exec sxiv -a "$dir"/*
+sxiv -a "$dir"/* > /dev/null 2>&1
