@@ -25,23 +25,27 @@ if soup.find(string="この番号に対応する作品が見つかりません�
 title = soup.find("h1", id="work_name").a.text.strip()
 cover = "https:" + soup.find("ul", class_="slider_items trans").li.img["src"]
 circle = soup.find("table", id="work_maker").tr.td.span.a.text.strip()
-
 outline = soup.find("table", id="work_outline")
+nsfw = "Yes" if outline.find("th", string="年齢指定").parent.span.text.strip() == "18禁" else "No"
+genres = " ".join(x.text.strip() for x in outline.find("th", string="ジャンル").parent.div.find_all("a"))
+filesize = outline.find("th", string="ファイル容量").parent.div.text.strip()[3:]
+
 release_date = outline.find("th", string="販売日").parent.td.a.text.strip()
+release_date = re.sub('[^0-9]', '-', release_date.split('日')[0])
+
 find_illustrator = outline.find("th", string="イラスト")
 illustrator = find_illustrator.parent.td.a.text.strip() if find_illustrator else "NULL"
-seiyuu = (x.text.strip() for x in outline.find("th", string="声優").parent.td.find_all("a"))
-nsfw = outline.find("th", string="年齢指定").parent.span.text.strip() == "18禁"
-genres = (x.text.strip() for x in outline.find("th", string="ジャンル").parent.div.find_all("a"))
-filesize = outline.find("th", string="ファイル容量").parent.div.text.strip()[3:]
+
+find_seiyuu = outline.find("th", string="声優")
+seiyuu = " ".join(x.text.strip() for x in find_seiyuu.parent.td.find_all("a")) if find_seiyuu else "NULL"
 
 print(f"Code: {id}")
 print(f"Title: {title}")
 print(f"Cover: {cover}")
 print(f"Circle: {circle}")
-print(f"Date: {re.sub('[^0-9]', '-', release_date.split('日')[0])}")
-print(f"Seiyuu: {' '.join(x for x in seiyuu)}")
+print(f"Date: {release_date}")
+print(f"Seiyuu: {seiyuu}")
 print(f"Illustrator: {illustrator}")
-print(f"Genres: {' '.join(x for x in genres)}")
-print(f"NSFW: {'Yes' if nsfw else 'No'}")
+print(f"Genres: {genres}")
+print(f"NSFW: {nsfw}")
 print(f"Filesize: {filesize}")
