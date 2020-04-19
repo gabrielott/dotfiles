@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# Prints the extension of a filename to stdout. If the -n flag is used,
+# the filename with the extension removed will be printed instead. If
+# the filename has no extension, starts or ends with '.', and the -n
+# flag is not used, the script will exit with an error and not print anything.
+
+[ "$1" = '-n' ] && { inv=1; shift; }
+[ $# -ne 1 ] && { echo 'Usage: ext [-n] filename'; exit 1; }
+
+base="$(basename "$1")"
+
+if [ "$inv" = 1 ]; then
+	echo "$base" | sed 's_\(.*\)\..*_\1_'
+else
+	echo "$base" | grep '.\..' > /dev/null 2>&1 || exit 1
+	echo "$base" | sed 's_.*\.\(.*\)_\1_'
+fi

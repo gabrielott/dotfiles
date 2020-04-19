@@ -1,0 +1,34 @@
+#!/bin/sh
+
+# Used to Rename the EXtension of a file. If the number of arguments passed to the script is
+# n, n must be greater than 1. The files specified by the first n-1 arguments will have
+# their extension changed to the nth argument. If the file doesn't have an extension, the
+# specified one will be appended to the filename. The -f flag can be used to force an 
+# overwrite if the file already exists.
+
+[ "$1" = '-f' ] && { force=1; shift; }
+[ $# -ge 2 ] || { echo 'Usage: rex [-f] file [file] [...] [file] new_extension'; exit 1; }
+
+eval ext=\${$#}
+while [ $# -gt 1 ]; do
+	if ! [ -e "$1" ]; then
+		err=1
+		printf "Filename %s is not a valid file.\n" "$1"
+		shift
+		continue
+	fi
+
+	new="$(dirname "$1")"/"$(ext -n "$1")"."$ext"
+
+	if [ -e "$new" -a "$force" != 1 ]; then
+		err=1
+		printf "File %s already exists.\n" "$new"
+		shift
+		continue
+	fi
+
+	mv "$1" "$new"
+	shift
+done
+
+[ "$err" = 1 ] && exit 1
