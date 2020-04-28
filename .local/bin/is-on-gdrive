@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# Receives one or more paths as arguments and exits successfully if any of them is located on my
+# gdrive mountpoint.
+
+while [ $# -gt 0 ]; do
+	[ -e "$1" ] || { shift; continue; }
+	echo "$(realpath "$1")" | grep '^/media/drive' > /dev/null 2>&1 && exit 0
+	shift
+done
+
+exit 1
