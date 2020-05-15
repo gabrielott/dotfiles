@@ -1,0 +1,64 @@
+#!/bin/sh
+
+# Receives as input one or more directories containing a voice work. After trying to
+# determine the work's rj code from the directory's name, it converts every wav file
+# to flac and every .txt file encoded as shift_jis to utf-8. After that, the directory
+# is put into a zip archive with a .koe extension and added to a database with the
+# work's info. Every .txt file not encoded as utf-8 is assumed to be shift_jis.
+
+KOE_DIR="$HOME/stuff2/koe/"
+
+err=0
+for dir in "$@"; do
+	if ! [ -d "$dir" ]; then
+		printf "%s is not a valid directory.\n" "$dir"
+		err=1
+		continue
+	fi
+
+	code="$(echo "$dir" | grep -Eio 'RJ[0-9]{6}')"
+	if [ -z "$code" ]; then 
+		printf "Couldnt't figure out RJ code from filename %s.\n" "$dir"
+		err=1
+		continue
+	fi
+
+	if grep -i "$code" "$KOE_DIR/db/db" > /dev/null 2>&1; then
+		printf "Work with filename %s in already in the database.\n" "$dir"
+		err=1
+		continue
+	fi
+
+	if ! info="$(koeinfo "$code")"; then
+		printf "Something went wrong while getting work info for %s.\n" "$dir"
+		err=1
+		continue
+	fi
+
+	formatted="$(echo "$info" | awk '
+		BEGIN { out = "" }
+		{
+			out = out "\t"
+			for(i = 2; i <= NF; i++) {
+				out = out (i == 2 ? "" : " ") $i
+			}
+		}
+		END { print substr(out, 2, length(out) - 1) }
+	')"
+
+	code="$(echo "$formatted" | cut -f1)"
+	cover="$(echo "$formatted" | cut -f3)"
+
+	find "$dir" -iregex '.*/.*\.\(wav\|aif\|aiff\)$' -exec toflac '{}' + -exec rm '{}' +
+	find "$dir" -iname '*.txt' -exec sh -c 'isutf8 "$0" || iconv -f shift_jis -t utf-8 -o "$0" "$0"' '{}' ';'
+
+	cd "$dir"
+	zip -0r "$KOE_DIR"/"$code".koe *
+	cd "$OLDPWD"
+	rm -r "$dir"
+
+	echo "$formatted" >> "$KOE_DIR"/db/db
+	curl -s -o "$KOE_DIR"/db/"$code" "$cover"
+done
+
+exit "$err"

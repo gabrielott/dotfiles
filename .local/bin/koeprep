@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# Meant to be used with archives created with koeadd. Receives one or more .koe files and
+# unzips them to a directory watched by plex so that they can be listened to remotely.
+
+err=0
+for file in "$@"; do
+	if ! [ -e "$file" ] && echo "$file" | grep -i '.koe$' > /dev/null 2>&1; then
+		echo "Invalid .koe file."
+		err=1
+		continue
+	fi
+
+	dir="$HOME"/stuff2/koe/plex/"$(ext -n "$file")"
+	mkdir -p "$dir"
+	unzip -d "$dir" "$file"
+done
+
+exit "$err"
