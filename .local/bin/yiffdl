@@ -1,0 +1,103 @@
+#!/bin/python3
+
+import sys, os
+import asyncio, aiohttp, urllib
+from bs4 import BeautifulSoup
+
+def mkdir_if_not_exists(path):
+    try:
+        os.mkdir(path)
+    except FileExistsError:
+        pass
+
+async def download_page(session, url, path, semaphore):
+    async with semaphore, session.get(url) as resp:
+        print(f"Downloading page {url}")
+        soup = BeautifulSoup(await resp.read(), "html.parser")
+        posts = soup.find(class_="row yp-posts-row").find_all("div", recursive=False)
+    await asyncio.gather(*(download_post(session, post, path, semaphore) for post in posts))
+
+async def download_post(session, post, path, semaphore):
+    title = post.find(class_="card-title").text.strip()[:-9]
+    body = post.find(class_="post-body").text
+    post_time = post.find(class_="post-time").text.split("T")[0]
+    dir_path = os.path.join(path, f"{post_time}-{title.replace('/', '-')}")
+    files = {}
+
+    mkdir_if_not_exists(dir_path)
+
+    # Media & Attachments
+    media_attachments = post.find_all(class_="card-attachments")
+    for content in media_attachments:
+        for link_filename in content.find_all("a"):
+            files[link_filename["href"]] = link_filename.text
+
+
+    # Post File
+    if card_action := post.find(class_="card-action"):
+        if post_file := card_action.find("a", text="Post file"):
+            url = post_file["href"]
+            filename = os.path.basename(urllib.parse.urlparse(url).path)
+            files[url] = filename
+
+    # Text
+    with open(os.path.join(dir_path, "body.txt"), "wt") as file:
+        file.write(body)
+
+    if files:
+        tasks = []
+        for url, filename in files.items():
+            file_path = os.path.join(dir_path, filename)
+            tasks.append(download_link(session, url, file_path, semaphore))
+
+        await asyncio.gather(*tasks)
+
+async def download_link(session, url, path, semaphore):
+    async with semaphore:
+        while True:
+            async with session.get(url) as resp:
+                print(f"Downloading {url}")
+                with open(path, "wb") as file:
+                    try:
+                        while chunk := await resp.content.read(1000):
+                            file.write(chunk)
+                    except aiohttp.ClientPayloadError:
+                        print(f"Error while downloading {url}, will retry in a second")
+                        await asyncio.sleep(1)
+                        continue
+
+            # Check whether what we just downloaded isn't actually a Cloudfare error page
+            with open(path, "rb") as file:
+                if file.read(15).decode(errors="ignore") == "<!DOCTYPE html>":
+                    print(f"=== Cloudfare {url} ===")
+                    await asyncio.sleep(1)
+                    continue
+                print(f"Finished {url}")
+                break
+
+async def main():
+    if len(sys.argv) != 2:
+        print("Usage: yiffdl <page_url>", file=sys.stderr)
+        exit(1)
+
+    url = sys.argv[1]
+    semaphore = asyncio.BoundedSemaphore(5)
+
+    async with aiohttp.ClientSession() as session:
+        tasks = []
+        async with session.get(url) as resp:
+            soup = BeautifulSoup(await resp.read(), "html.parser")
+            creator = soup.find(class_="yp-info-name").text.strip().replace("/", "-")
+            total_pages = int(soup.find(class_="paginate-count").text.split(" / ")[1])
+            mkdir_if_not_exists(creator)
+
+            posts = soup.find(class_="row yp-posts-row").find_all("div", recursive=False)
+            tasks.extend(download_post(session, post, creator, semaphore) for post in posts)
+
+        for page_number in range(2, total_pages + 1):
+            tasks.append(download_page(session, f"{url}?p={page_number}", creator, semaphore))
+
+        await asyncio.gather(*tasks)
+
+if __name__ == "__main__":
+    asyncio.run(main())
