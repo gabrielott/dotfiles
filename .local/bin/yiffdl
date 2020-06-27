@@ -1,8 +1,10 @@
 #!/bin/python3
 
-import sys, os
-import asyncio, aiohttp, urllib
+import sys, os, urllib, argparse
+import asyncio, aiohttp
 from bs4 import BeautifulSoup
+
+args = None
 
 def mkdir_if_not_exists(path):
     try:
@@ -21,38 +23,50 @@ async def download_post(session, post, path, semaphore):
     title = post.find(class_="card-title").text.strip()[:-9]
     body = post.find(class_="post-body").text
     post_time = post.find(class_="post-time").text.split("T")[0]
-    dir_path = os.path.join(path, f"{post_time}-{title.replace('/', '-')}")
+    dir_path = os.path.join(path, f"{post_time}_{title.replace('/', '-')}")
     files = {}
 
     mkdir_if_not_exists(dir_path)
 
     # Media & Attachments
-    media_attachments = post.find_all(class_="card-attachments")
-    for content in media_attachments:
-        for link_filename in content.find_all("a"):
-            files[link_filename["href"]] = link_filename.text
+    if not args.no_media:
+        media_attachments = post.find_all(class_="card-attachments")
+        for content in media_attachments:
+            for link_filename in content.find_all("a"):
+                files[link_filename["href"]] = link_filename.text
 
 
     # Post File
-    if card_action := post.find(class_="card-action"):
-        if post_file := card_action.find("a", text="Post file"):
-            url = post_file["href"]
-            filename = os.path.basename(urllib.parse.urlparse(url).path)
-            files[url] = filename
+    if not args.no_post_file:
+        if card_action := post.find(class_="card-action"):
+            if post_file := card_action.find("a", text="Post file"):
+                url = post_file["href"]
+                filename = os.path.basename(urllib.parse.urlparse(url).path)
+                extension = os.path.splitext(filename)[1]
+                files[url] = f"post_file{extension}"
+
+    # Embed Data
+    if not args.no_embed:
+        if embed_data := post.find(class_="card-embed"):
+            link = embed_data.find(text="URL").parent.parent.a["href"]
+            subject = embed_data.find(text="Subject").parent.parent.find(text=True, recursive=False)
+            with open(os.path.join(dir_path, "embed.txt"), "wt") as file:
+                file.write(f"{subject}\n{link}\n")
 
     # Text
-    with open(os.path.join(dir_path, "body.txt"), "wt") as file:
-        file.write(body)
+    if not args.no_text_body:
+        with open(os.path.join(dir_path, "body.txt"), "wt") as file:
+            file.write(body)
 
     if files:
         tasks = []
         for url, filename in files.items():
             file_path = os.path.join(dir_path, filename)
-            tasks.append(download_link(session, url, file_path, semaphore))
+            tasks.append(download_file(session, url, file_path, semaphore))
 
         await asyncio.gather(*tasks)
 
-async def download_link(session, url, path, semaphore):
+async def download_file(session, url, path, semaphore):
     async with semaphore:
         while True:
             async with session.get(url) as resp:
@@ -76,16 +90,27 @@ async def download_link(session, url, path, semaphore):
                 break
 
 async def main():
-    if len(sys.argv) != 2:
-        print("Usage: yiffdl <page_url>", file=sys.stderr)
-        exit(1)
+    global args
 
-    url = sys.argv[1]
-    semaphore = asyncio.BoundedSemaphore(5)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("url", help="url of the creator page to be downloaded")
+    parser.add_argument("-t", "--no-post-file", action="store_true", dest="no_post_file",
+                        help="don't download each post's post file")
+    parser.add_argument("-m", "--no-media", action="store_true", dest="no_media",
+                        help="don't download files in the attachments and media sections")
+    parser.add_argument("-b", "--no-text-body", action="store_true", dest="no_text_body",
+                        help="don't create a text file with each post's body")
+    parser.add_argument("-e", "--no-embed", action="store_true", dest="no_embed",
+                        help="don't create a text file with each post's embedded data")
+    parser.add_argument("-d", "--concurrent-downloads", type=int, dest="concurrent_downloads", default=5,
+                        help="maximum number of files that will be downloaded at the same time")
+    args = parser.parse_args()
+
+    semaphore = asyncio.BoundedSemaphore(args.concurrent_downloads)
 
     async with aiohttp.ClientSession() as session:
         tasks = []
-        async with session.get(url) as resp:
+        async with session.get(args.url) as resp:
             soup = BeautifulSoup(await resp.read(), "html.parser")
             creator = soup.find(class_="yp-info-name").text.strip().replace("/", "-")
             total_pages = int(soup.find(class_="paginate-count").text.split(" / ")[1])
@@ -95,7 +120,7 @@ async def main():
             tasks.extend(download_post(session, post, creator, semaphore) for post in posts)
 
         for page_number in range(2, total_pages + 1):
-            tasks.append(download_page(session, f"{url}?p={page_number}", creator, semaphore))
+            tasks.append(download_page(session, f"{args.url}?p={page_number}", creator, semaphore))
 
         await asyncio.gather(*tasks)
 
