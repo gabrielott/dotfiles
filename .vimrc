@@ -37,6 +37,15 @@ set smartcase
 set hidden
 set wildmenu
 set scrolloff=3
+set listchars=eol:¬,tab:>·,trail:~,extends:>,precedes:<,space:␣
+set foldmethod=indent
+set foldnestmax=2
+
+" Fix Ctrl-[ O delay
+" :h vt100-cursor-keys
+set notimeout
+set ttimeout
+set timeoutlen=100
 filetype plugin indent on
 syntax on
 " Fix colors
