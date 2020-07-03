@@ -5,6 +5,7 @@ import asyncio, aiohttp
 from bs4 import BeautifulSoup
 
 args = None
+file_locks = {}
 
 def mkdir_if_not_exists(path):
     try:
@@ -70,24 +71,45 @@ async def download_file(session, url, path, semaphore):
     async with semaphore:
         while True:
             async with session.get(url) as resp:
-                print(f"Downloading {url}")
-                with open(path, "wb") as file:
-                    try:
-                        while chunk := await resp.content.read(1000):
-                            file.write(chunk)
-                    except aiohttp.ClientPayloadError:
-                        print(f"Error while downloading {url}, will retry in a second")
-                        await asyncio.sleep(1)
-                        continue
-
-            # Check whether what we just downloaded isn't actually a Cloudfare error page
-            with open(path, "rb") as file:
-                if file.read(15).decode(errors="ignore") == "<!DOCTYPE html>":
-                    print(f"=== Cloudfare {url} ===")
+                if resp.status != 200:
+                    print(f"Error while downloading {url}, will retry in a second")
                     await asyncio.sleep(1)
                     continue
-                print(f"Finished {url}")
-                break
+
+                if not file_locks.get(path):
+                    file_locks[path] = asyncio.Lock()
+
+                # Ensures there's only one task downloading to a certain path at the same time
+                async with file_locks[path]:
+                    if os.path.isfile(path):
+                        if os.path.getsize(path) == int(resp.headers["Content-Length"]):
+                            print(f"{url} seems to contain a duplicate file, skipping")
+                            break
+                        else:
+                            while True:
+                                filename, ext = os.path.splitext(path)
+                                path = f"{filename}_{ext}"
+                                if not os.path.isfile(path):
+                                    break
+
+                    print(f"Downloading {url}")
+                    with open(path, "wb") as file:
+                        try:
+                            while chunk := await resp.content.read(1000):
+                                file.write(chunk)
+                        except aiohttp.ClientPayloadError:
+                            print(f"Error while downloading {url}, will retry in a second")
+                            await asyncio.sleep(1)
+                            continue
+
+                    # Checks whether what we just downloaded isn't actually a Cloudfare error page
+                    with open(path, "rb") as file:
+                        if file.read(15).decode(errors="ignore") == "<!DOCTYPE html>":
+                            print(f"=== Cloudfare {url} ===")
+                            await asyncio.sleep(1)
+                            continue
+                        print(f"Finished {url}")
+                        break
 
 async def main():
     global args
