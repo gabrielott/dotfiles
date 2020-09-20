@@ -1,8 +1,9 @@
-xrandr --output DP-4 --auto --output DVI-D-0 --scale 2x2 --right-of DP-4
+xrandr --output DP-4 --auto --output DVI-D-0 --scale 1.5x1.5 --right-of DP-4
 
 fcitx &
 sxhkd &
-compton &
+picom &
 polybar -r mybar &
+dunst &
 wal -R &
 [ ! -s ~/stuff2/mpd/pid ] && mpd &
