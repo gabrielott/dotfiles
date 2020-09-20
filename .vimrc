@@ -16,13 +16,22 @@ Plug 'tpope/vim-surround'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-apathy'
 Plug 'sheerun/vim-polyglot'
-Plug 'psliwka/vim-smoothie'
+" Plug 'psliwka/vim-smoothie'
 Plug 'jiangmiao/auto-pairs'
+Plug 'lervag/vimtex'
+Plug 'KeitaNakamura/tex-conceal.vim', {'for': 'tex'}
 Plug 'arzg/vim-colors-xcode'
+Plug 'morhetz/gruvbox'
 call plug#end()
 
 let g:AutoPairsFlyMode = 1
 let g:AutoPairsShortcutBackInsert = '<C-b>'
+
+let g:tex_flavor = 'latex'
+let g:vimtex_fold_enabled = 1
+let g:vimtex_compiler_method = 'latexmk'
+
+let g:gruvbox_contrast_dark = 'hard'
 
 set encoding=utf-8
 set fileencodings=ucs-bom,uft-8,default,sjis
@@ -40,6 +49,8 @@ set scrolloff=3
 set listchars=eol:¬,tab:>·,trail:~,extends:>,precedes:<,space:␣
 set foldmethod=indent
 set foldnestmax=2
+set conceallevel=2
+set background=dark
 
 " Fix Ctrl-[ O delay
 " :h vt100-cursor-keys
@@ -52,9 +63,10 @@ syntax on
 set termguicolors
 set t_8f=[38;2;%lu;%lu;%lum
 set t_8b=[48;2;%lu;%lu;%lum
-colorscheme xcodedarkhc
+colorscheme gruvbox
 
 let mapleader = "\<Space>"
+let maplocalleader = "\<Space>"
 " Buffer management
 nnoremap <Leader>b :ls<CR>:buffer<Space>
 nnoremap <Leader>B :ls<CR>:sbuffer<Space>
@@ -92,6 +104,7 @@ autocmd FileType c nnoremap <buffer> <Leader>r :w<CR>:!clear;gcc -o %:r.out -Wal
 autocmd FileType java nnoremap <buffer> <Leader>r :w<CR>:!clear;javac % && java %:r<CR>
 autocmd FileType sh nnoremap <buffer> <Leader>r :w<CR>:!clear;./%<CR>
 autocmd FileType scheme nnoremap <buffer> <Leader>r :w<CR>:!clear;scheme < %<CR>
+autocmd FileType ruby nnoremap <buffer> <Leader>r :w<CR>:!clear;ruby %<CR>
 
 " Compile
 autocmd FileType c nnoremap <buffer> <Leader>c :w<CR>:!gcc -o %:r.out -Wall -Wextra -std=c11 -pedantic %<CR><CR>
