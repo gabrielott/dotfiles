@@ -13,6 +13,6 @@ base="$(basename "$1")"
 if [ "$inv" = 1 ]; then
 	echo "$base" | sed 's_\(.*\)\..*_\1_'
 else
-	echo "$base" | grep '.\..' > /dev/null 2>&1 || exit 1
+	echo "$base" | grep '.\..' > /dev/null 2>&1 || exit 0
 	echo "$base" | sed 's_.*\.\(.*\)_\1_'
 fi
