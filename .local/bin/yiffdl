@@ -1,5 +1,8 @@
 #!/bin/python3
 
+# Downloads all posts from a creator in yiff.party
+# Use the flag --help to see a list of options.
+
 import sys, os, urllib, argparse
 import asyncio, aiohttp
 from bs4 import BeautifulSoup
@@ -36,7 +39,6 @@ async def download_post(session, post, path, semaphore):
             for link_filename in content.find_all("a"):
                 files[link_filename["href"]] = link_filename.text
 
-
     # Post File
     if not args.no_post_file:
         if card_action := post.find(class_="card-action"):
@@ -53,6 +55,12 @@ async def download_post(session, post, path, semaphore):
             subject = embed_data.find(text="Subject").parent.parent.find(text=True, recursive=False)
             with open(os.path.join(dir_path, "embed.txt"), "wt") as file:
                 file.write(f"{subject}\n{link}\n")
+
+    # Links
+    if not args.no_links:
+        if links := [a["href"] for a in post.find(class_="post-body").find_all("a")]:
+            with open(os.path.join(dir_path, "links.txt"), "wt") as file:
+                file.write('\n'.join(links) + "\n")
 
     # Text
     if not args.no_text_body:
@@ -72,7 +80,7 @@ async def download_file(session, url, path, semaphore):
         while True:
             async with session.get(url) as resp:
                 if resp.status != 200:
-                    print(f"Error while downloading {url}, will retry in a second")
+                    print(f"Error while downloading {url}, will retry in a second (status != 200)")
                     await asyncio.sleep(1)
                     continue
 
@@ -98,7 +106,7 @@ async def download_file(session, url, path, semaphore):
                             while chunk := await resp.content.read(1000):
                                 file.write(chunk)
                         except aiohttp.ClientPayloadError:
-                            print(f"Error while downloading {url}, will retry in a second")
+                            print(f"Error while downloading {url}, will retry in a second (ClientPayloadError)")
                             await asyncio.sleep(1)
                             continue
 
@@ -124,6 +132,8 @@ async def main():
                         help="don't create a text file with each post's body")
     parser.add_argument("-e", "--no-embed", action="store_true", dest="no_embed",
                         help="don't create a text file with each post's embedded data")
+    parser.add_argument("-l", "--no-links", action="store_true", dest="no_links",
+                        help="don't create a text file with each post's links")
     parser.add_argument("-d", "--concurrent-downloads", type=int, dest="concurrent_downloads", default=5,
                         help="maximum number of files that will be downloaded at the same time")
     args = parser.parse_args()
