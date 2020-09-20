@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# Receives an URL as an argument and prints to stdout where the URL redirects to
+
+while [ $# -gt 0 ]; do
+	curl "$1" --silent --location --output /dev/null --write-out '%{url_effective}\n'
+	shift
+done
