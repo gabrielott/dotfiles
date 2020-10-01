@@ -30,6 +30,11 @@ async def download_post(session, post, path, semaphore):
     dir_path = os.path.join(path, f"{post_time}_{title.replace('/', '-')}")
     files = {}
 
+    # Skip if dir already exists and --continue flag is set
+    if args.no_redownload and os.path.exists(dir_path):
+        print(f"Skipping post {title} (directory already exists and --continue flag set)")
+        return
+
     mkdir_if_not_exists(dir_path)
 
     # Media & Attachments
@@ -124,6 +129,8 @@ async def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument("url", help="url of the creator page to be downloaded")
+    parser.add_argument("-c", "--continue", action="store_true", dest="no_redownload",
+                        help="don't download posts that have already been downloaded")
     parser.add_argument("-t", "--no-post-file", action="store_true", dest="no_post_file",
                         help="don't download each post's post file")
     parser.add_argument("-m", "--no-media", action="store_true", dest="no_media",
@@ -135,7 +142,7 @@ async def main():
     parser.add_argument("-l", "--no-links", action="store_true", dest="no_links",
                         help="don't create a text file with each post's links")
     parser.add_argument("-d", "--concurrent-downloads", type=int, dest="concurrent_downloads", default=5,
-                        help="maximum number of files that will be downloaded at the same time")
+                        help="maximum number of files that will be downloaded at the same time (default is 5)")
     args = parser.parse_args()
 
     semaphore = asyncio.BoundedSemaphore(args.concurrent_downloads)
