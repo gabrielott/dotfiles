@@ -1,0 +1,67 @@
+#!/bin/python3
+import sys
+import subprocess
+import argparse
+
+def make_ffmpeg_args(files, rows, cols, final_width, final_height):
+    width = final_width // cols
+    height = final_height // rows
+
+    args = ["ffmpeg"]
+    for file in files:
+        args.append("-i")
+        args.append(file)
+
+    args.append("-filter_complex")
+
+    filtercom = ""
+    for i, file in enumerate(files):
+        filtercom += f"[{i}:v]scale={width}:{height}:force_original_aspect_ratio=decrease,"
+        filtercom += f"pad={width}:{height}:-1:-1:color=black[{i}];"
+
+    filtercom += "".join(f"[{i}]" for i in range(len(files)))
+    filtercom += f"xstack=inputs={len(files)}:layout="
+
+    for i in range(cols):
+        for j in range(rows):
+            filtercom += "0" + (i * "+w0") + "_0" + (j * "+h0") + "|"
+
+    filtercom = filtercom[:-1] + "[v];"
+    filtercom += "".join(f"[{i}:a]" for i in range(len(files)))
+    filtercom += f"amix=inputs={len(files)}[a]"
+
+    args.append(filtercom)
+
+    args.extend(("-map", "[v]", "-map", "[a]", "-ac", "2", "-f", "matroska",
+                 "-c:v", "h264_nvenc", "-b:v", "32M", "-rc:v", "cbr",
+                 "-preset", "llhp", "-"))
+
+    return args
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("layout")
+    parser.add_argument("file", nargs="+")
+    args = parser.parse_args()
+
+    try:
+        rows, cols = [int(x) for x in args.layout.lower().split("x")]
+    except ValueError:
+        print("Invalid layout.", file=sys.stderr)
+        exit(1)
+
+    if rows * cols != len(args.file):
+        print("Number of spaces must be equal to number of files.", file=sys.stderr)
+        exit(1)
+
+    ffmpeg_args = make_ffmpeg_args(args.file, rows, cols, 3840, 2160)
+    ffmpeg = subprocess.Popen(ffmpeg_args, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+
+    mpv_args = ["mpv", "--demuxer-max-bytes=1000MiB", "-"]
+    mpv = subprocess.Popen(mpv_args, stdin=ffmpeg.stdout,
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    mpv.wait()
+    ffmpeg.terminate()
+
+if __name__ == "__main__":
+    main()

@@ -7,3 +7,8 @@ polybar -r mybar &
 dunst &
 wal -R &
 [ ! -s ~/stuff2/mpd/pid ] && mpd &
+
+# This has to come after fcitx
+# The delay lets fcitx set things up before loading the custom layout
+sleep 2
+xkbcomp -I"$HOME/.config/xkb" "$HOME/.config/xkb/base.xkb" $DISPLAY

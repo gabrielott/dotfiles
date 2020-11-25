@@ -6,10 +6,10 @@
 
 # If the script is already running, kill it and exit
 pid="$(pidof -o '%PPID' -x "$0")"
-[ -n "$pid" ] && kill "$pid" && exit 0
+[ -n "$pid" ] && kill "$pid" && notify-send -t 1000 'tabs-mpv' 'Killed running process' && exit 0
 
-options="$(firetabs | grep 'video\|watch')"
-[ -z "$options" ] && exit 1
+options="$(firetabs | grep 'video\|watch\|twitch')"
+[ -z "$options" ] && notify-send -t 1000 'tabs-mpv' "Couldn't find any tabs with video" && exit 1
 
 if [ "$(echo "$options" | wc -l)" -gt 1 ]; then
 	selected="$(echo "$options" | dmenu -i -p 'Choose tab:' -l 10 | cut -f2)"
@@ -22,4 +22,5 @@ fi
 kill_mpv() { kill "$!"; }
 trap kill_mpv TERM
 mpv "$@" "$selected" &
+notify-send -t 1000 'tabs-mpv' 'Starting mpv'
 wait "$!"

@@ -30,6 +30,15 @@ let g:AutoPairsShortcutBackInsert = '<C-b>'
 let g:tex_flavor = 'latex'
 let g:vimtex_fold_enabled = 1
 let g:vimtex_compiler_method = 'latexmk'
+let g:vimtex_compiler_latexmk = {
+      \ 'options' : [
+      \   '-verbose',
+      \   '-file-line-error',
+      \   '-synctex=1',
+      \   '-interaction=nonstopmode',
+      \   '-shell-escape',
+      \ ],
+      \}
 
 let g:gruvbox_contrast_dark = 'hard'
 
@@ -46,6 +55,7 @@ set smartcase
 set hidden
 set wildmenu
 set scrolloff=3
+set tabstop=4 softtabstop=4 shiftwidth=4
 set listchars=eol:¬,tab:>·,trail:~,extends:>,precedes:<,space:␣
 set foldmethod=indent
 set foldnestmax=2
@@ -59,6 +69,7 @@ set ttimeout
 set timeoutlen=100
 filetype plugin indent on
 syntax on
+syntax sync minlines=100
 " Fix colors
 set termguicolors
 set t_8f=[38;2;%lu;%lu;%lum
@@ -89,6 +100,12 @@ nnoremap <Leader>p "+p
 vnoremap <Leader>p "+p
 nnoremap <Leader>P "+P
 
+" Visual lines
+nnoremap j gj
+nnoremap k gk
+nnoremap gj j
+nnoremap gk k
+
 " Miscellaneous
 nnoremap <Leader>. :e ~/.vimrc<CR>     " Open this file
 nnoremap <Leader>R :!lf<CR><CR>        " Run lf
@@ -100,15 +117,15 @@ autocmd BufWritePost .vimrc source %
 " Compile and/or run
 autocmd FileType python nnoremap <buffer> <Leader>r :w<CR>:!clear;python %<CR>
 autocmd FileType javascript nnoremap <buffer> <Leader>r :w<CR>:!clear;node %<CR>
-autocmd FileType c nnoremap <buffer> <Leader>r :w<CR>:!clear;gcc -o %:r.out -Wall -Wextra -std=c11 -pedantic % && ./%:r.out<CR>
+autocmd FileType c nnoremap <buffer> <Leader>r :w<CR>:!clear;gcc -o %:r.out -Wall -Wextra -pedantic % && ./%:r.out<CR>
 autocmd FileType java nnoremap <buffer> <Leader>r :w<CR>:!clear;javac % && java %:r<CR>
 autocmd FileType sh nnoremap <buffer> <Leader>r :w<CR>:!clear;./%<CR>
 autocmd FileType scheme nnoremap <buffer> <Leader>r :w<CR>:!clear;scheme < %<CR>
 autocmd FileType ruby nnoremap <buffer> <Leader>r :w<CR>:!clear;ruby %<CR>
 
 " Compile
-autocmd FileType c nnoremap <buffer> <Leader>c :w<CR>:!gcc -o %:r.out -Wall -Wextra -std=c11 -pedantic %<CR><CR>
+autocmd FileType c nnoremap <buffer> <Leader>c :w<CR>:!gcc -o %:r.out -Wall -Wextra -pedantic %<CR><CR>
 autocmd FileType java nnoremap <buffer> <Leader>c :w<CR>:!javac %<CR><CR>
 
 " Compile to assembly and show result in new split
-autocmd FileType c nnoremap <buffer> <Leader>C :w<CR>:!gcc -o %:r.s -Wall -Wextra -std=c11 -pedantic -O1 -m32 -S %<CR><CR>:split %:r.s<CR>:e<CR>
+autocmd FileType c nnoremap <buffer> <Leader>C :w<CR>:!gcc -o %:r.s -Wall -Wextra -pedantic -O1 -m32 -S %<CR><CR>:split %:r.s<CR>:e<CR>

@@ -1,86 +1,185 @@
-super + Return
-	$TERMINAL
-super + space
-	dmenu_run
-super + f
-	$TERMINAL -e $FILE
-super + c
-	killall compton || compton
-super + Escape
-	pkill -USR1 -x sxhkd
-super + {_,shift} + v
-	tabs-mpv {_,--no-video}
-{_,control,shift} + XF86AudioRaiseVolume
-	pactl set-sink-volume alsa_output.pci-0000_0d_00.3.analog-stereo +{5,1,10}%
-{_,control,shift} + XF86AudioLowerVolume
-	pactl set-sink-volume alsa_output.pci-0000_0d_00.3.analog-stereo -{5,1,10}%
-super + {_,control,shift} + XF86AudioRaiseVolume
-	mpc volume +{5,1,10}
-super + {_,control,shift} + XF86AudioLowerVolume
-	mpc volume -{5,1,10}
-XF86AudioMute
-	pactl set-sink-mute alsa_output.pci-0000_0d_00.3.analog-stereo toggle
-super + XF86AudioMute
-	mpc seek 0
-XF86Audio{Prev,Next}
-	mpc {prev,next}
-super + {_,control,shift} XF86AudioPrev
-	mpc seek -{10,5,30}
-super + {_,control,shift} XF86AudioNext
-	mpc seek +{10,5,30}
-{_,shift} + XF86AudioPlay
-	mpc {toggle,stop}
-control + XF86AudioPlay
-	dmenu -p 'Enter time to seek to' | xargs mpc seek
-super + {_,control,shift} + XF86AudioPlay
-	$TERMINAL -c 'pick-song' -e pick-song {_,-q,-b}
-@Print
-	scrot -s
-shift + Print
-	scrot -u
+# vim: foldmethod=marker
 
-# bspwm
-
+# system {{{
 super + shift + q
 	bspc quit
+
+super + alt + q
+	pgrep genymotion-play && genymotion-player --vm-name AL --poweroff;\
+	sleep 1; sudo virsh start win10
+	
 super + shift + r
-	bspc wm -r
+	pkill -USR1 -x sxhkd && notify-send 'sxhkd' 'Reloaded'
+
+super + alt + r
+	bspc wm --restart && notify-send 'bspwm' 'Reloaded'
+
+super + c
+	{killall picom && notify-send 'picom' 'Stopped',\
+	notify-send 'picom' 'Started' && picom}
+# }}}
+
+# open {{{
+super + Return
+	$TERMINAL
+
+super + Escape
+	pid="$(xdotool search --class 'scratchpad')";\
+	bspc node "$pid" --flag hidden;\
+	bspc node "$pid" --focus
+
+super + space
+	dmenu_run
+
+super + f
+	firefox
+
+super + a
+	bspc desktop --focus DVI-D-0:^1; bspc desktop --focus DP-4:^2;\
+	pgrep -fx 'python3 /usr/bin/anki' || anki
+
+super + y
+	bspc desktop --focus DP-4:^3;\
+	pgrep -fx 'python -OO /opt/hydrus/client.pyw' || hydrus-client
+
+super + d
+	discord
+
+super + shift + x
+	if ! pgrep genymotion-play; then \
+		notify-send 'genymotion' 'Starting Azur Lane...';\
+		genymotion-player --vm-name AL &\
+		sleep 25; adb shell monkey -p com.YoStarJP.AzurLane 1;\
+		sleep 20; adb shell input tap 100 100;\
+		sleep 3; adb shell input tap 100 100;\
+		sleep 1; bspc desktop --activate DVI-D-0:^2;\
+	else genymotion-player --vm-name AL --poweroff; fi
+# }}}
+
+# media {{{
+{_,control,shift} + XF86AudioRaiseVolume
+	pactl set-sink-volume alsa_output.pci-0000_0d_00.3.analog-stereo +{5,1,10}%
+
+{_,control,shift} + XF86AudioLowerVolume
+	pactl set-sink-volume alsa_output.pci-0000_0d_00.3.analog-stereo -{5,1,10}%
+
+super + {_,control,shift} + XF86AudioRaiseVolume
+	mpc volume +{5,1,10}
+
+super + {_,control,shift} + XF86AudioLowerVolume
+	mpc volume -{5,1,10}
+
+XF86AudioMute
+	pactl set-sink-mute alsa_output.pci-0000_0d_00.3.analog-stereo toggle
+
+super + XF86AudioMute
+	mpc seek 0
+
+XF86Audio{Prev,Next}
+	mpc {prev,next}
+
+super + {_,control,shift} XF86AudioPrev
+	mpc seek -{10,5,30}
+
+super + {_,control,shift} XF86AudioNext
+	mpc seek +{10,5,30}
+
+{_,shift} + XF86AudioPlay
+	mpc {toggle,stop}
+
+control + XF86AudioPlay
+	dmenu -p 'Enter time to seek to' | xargs mpc seek
+
+super + {_,control,shift} + XF86AudioPlay
+	$TERMINAL -c 'pick-song' -e pick-song {_,-q,-b}
+
+super + {_,shift} + v
+	tabs-mpv {_,--no-video}
+
+@Print
+	scrot -s
+
+shift + Print
+	scrot -u
+# }}}
+
+# window management {{{
+# nodes {{{
 super + q
-	bspc node -c
+	bspc node --close
+
 super + m
-	bspc desktop -l next
+	bspc desktop --layout next
+
 super + s; {t,shift + t,l,f}
-	bspc node -t {tiled,pseudo_tiled,floating,fullscreen}
+	bspc node focused --state {tiled,pseudo_tiled,floating,fullscreen}
+
 super + g; {h,m,l,s,p}
-	bspc node -g {hidden,marked,locked,sticky,private}
+	bspc node focused --flag {hidden,marked,locked,sticky,private}
+
 super + g; shift + h
-	bspc node any.hidden -g hidden
+	bspc node any.hidden --flag hidden
+
 super + {_,shift} + {h,j,k,l}
-	bspc node -{f,s} {west,south,north,east}
+	bspc node focused --{focus,swap} {west,south,north,east}
+
 super + {p,b,comma,period}
-	bspc node -f @{parent,brother,first,second}
+	bspc node focused --focus @{parent,brother,first,second}
+
 super + {_,shift} + n
-	bspc node -f {next,prev}.local
-super + {grave,Tab}
-	bspc {node,desktop} -f last
+	bspc node focused --focus {next,prev}.local
+
+super + {Tab,grave}
+	bspc {node,desktop} --focus last
+
 super + {o,i}
-	bspc wm -h off; \
-	bspc node {older,newer} -f; \
-	bspc wm -h on
-super + {_,shift} + {1-9,0}
-	bspc {desktop -f,node -d} focused:^{1-9,10}
-super + {_,shift} + backslash
-	bspc {desktop -f,node -d} last:focused
+	bspc wm --record-history off;\
+	bspc node {older,newer} --follow f;\
+	bspc wm --record-history on
+
 super + control + {h,j,k,l,space}
-	bspc node -p {west,south,north,east,cancel}
+	bspc node --presel-dir {west,south,north,east,cancel}
+
 super + control + {1-9}
-	bspc node -o 0.{1-9}
+	bspc node --presel-ratio 0.{1-9}
+
 super + alt + {h,j,k,l}
-	bspc node -z {left -40 0,bottom 0 40,top 0 -40,right 40 0}
+	bspc node --resize {left -40 0,bottom 0 40,top 0 -40,right 40 0}
+
+super + t
+	bspc node newest.marked.local --to-node newest.!automatic.local || \
+	bspc node focused --to-node newest.!automatic
+
+super + z
+	bspc node focused --swap biggest.window.local
+
+# }}}
+
+# desktops {{{
+super + {_,shift} + {1-9,0}
+	bspc {desktop --focus,node --to-desktop} focused:^{1-9,10}
+
+super + {_,shift} + backslash
+	bspc {desktop --focus,node --to-desktop} next:focused
+# }}}
+
+# misc {{{
 super + F1
 	{polybar-msg cmd hide; bspc config -m DP-4 top_padding 0 ,\
 	polybar-msg cmd show; bspc config -m DP-4 top_padding 35}
+
 super + {F2,F3}
 	bspc config -m DP-4 window_gap $(($(bspc config -m DP-4 window_gap) {-,+} 5))
+
 super + shift + {F2,F3}
 	bspc config -m DP-4 window_gap {0,30}
+
+super + F4
+	{bspc config border_width 0,\
+	bspc config border_width 7}
+# }}}
+# }}}
+
+super + x
+	{adb shell input keyevent 26 && sleep 3 && pkill -STOP VBoxHeadless && notify-send 'Genymotion' 'Paused',\
+	pkill -CONT VBoxHeadless && sleep 3 && adb shell input keyevent 26 && notify-send 'Genymotion' 'Unpaused'}
