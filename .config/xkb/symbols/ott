@@ -1,0 +1,98 @@
+partial alphanumeric_keys modifier_keys xkb_symbols "ott" {
+	name[Group1] = "English (ott)";
+	key.type[Group1] = "FOUR_LEVEL";
+
+	// 1
+	key <AE01> {
+		symbols[Group1] = [1, exclam, 1, onesuperior]
+	};
+
+	// 2
+	key <AE02> {
+		symbols[Group1] = [2, at, 2, twosuperior]
+	};
+
+	// 3
+	key <AE03> {
+		symbols[Group1] = [3, numbersign, 3, threesuperior]
+	};
+
+	// 4
+	key <AE04> {
+		symbols[Group1] = [4, dollar, EuroSign, foursuperior]
+	};
+
+	// 5
+	key <AE05> {
+		symbols[Group1] = [5, percent, 5, fivesuperior]
+	};
+
+	// 6
+	key <AE06> {
+		symbols[Group1] = [6, asciicircum, 6, sixsuperior]
+	};
+
+	// 7
+	key <AE07> {
+		symbols[Group1] = [7, ampersand, 7, sevensuperior]
+	};
+
+	// 8
+	key <AE08> {
+		symbols[Group1] = [8, asterisk, 8, eightsuperior]
+	};
+
+	// 9
+	key <AE09> {
+		symbols[Group1] = [9, parenleft, 9, ninesuperior]
+	};
+
+	// 0
+	key <AE10> {
+		symbols[Group1] = [0, parenright, degree, zerosuperior]
+	};
+
+	// -_–—
+	key <AE11> {
+		symbols[Group1] = [minus, underscore, emdash, endash]
+	};
+
+	// =+≠×
+	key <AE12> {
+		symbols[Group1] = [equal, plus, notequal, multiply]
+	};
+
+	// [{(
+	key <AD11> {
+		symbols[Group1] = [bracketleft, braceleft, parenleft, parenleft]
+	};
+
+	// ]})
+	key <AD12> {
+		symbols[Group1] = [bracketright, braceright, parenright, parenright]
+	};
+
+	// '"~^
+	key <AC11> {
+		symbols[Group1] = [apostrophe, quotedbl, quotedbl, quotedbl]
+	};
+
+	// cCçÇ
+	key <AB03> {
+		symbols[Group1] = [c, C, ccedilla, Ccedilla]
+	};
+
+	key <AB08> {
+		symbols[Group1] = [comma, less, dead_acute, dead_grave]
+	};
+
+	key <AB09> {
+		symbols[Group1] = [period, greater, dead_tilde, dead_circumflex]
+	};
+
+	// Right alt
+	key <RALT> {
+		symbols[Group1] = [ISO_Level3_Shift],
+		virtualMods = AltGr
+	};
+};
