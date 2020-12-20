@@ -1,0 +1,28 @@
+#!/bin/sh
+
+if ! pgrep -f 'genymotion-player' > /dev/null 2>&1; then
+	notify-send 'genymotion' 'Starting Azur Lane...'
+	bspc desktop --activate DP-0:^13
+	genymotion-player --vm-name AL &
+	sleep 28
+	adb shell monkey -p com.YoStarJP.AzurLane 1
+	sleep 23
+	adb shell input tap 100 100
+	sleep 5
+	adb shell input tap 100 100
+else
+	bspc desktop --focus DP-0:^13
+	pkill -CONT VBoxHeadless
+	sleep 1
+	adb shell input keyevent 26
+fi
+
+bspc subscribe | while read -r line; do
+	value="$(echo "$line" | sed 's/.*\(.\)ア.*/\1/')"
+	if [ "$value" = o ] && ! pgrep -r T VBoxHeadless > /dev/null 2>&1; then
+		adb shell input keyevent 26
+		sleep 1
+		pkill -STOP VBoxHeadless
+		break
+	fi
+done

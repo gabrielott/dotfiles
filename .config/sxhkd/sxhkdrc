@@ -5,8 +5,10 @@ super + shift + q
 	bspc quit
 
 super + alt + q
-	pgrep genymotion-play && genymotion-player --vm-name AL --poweroff;\
-	sleep 1; sudo virsh start win10
+	pgrep -fx '/opt/genymotion/player --vm-name 5558d302-efea-430e-9ab6-2eca6dcad732' && \
+	genymotion-player --vm-name AL --poweroff && \
+	sleep 1; \
+	sudo virsh start win10
 	
 super + shift + r
 	pkill -USR1 -x sxhkd && notify-send 'sxhkd' 'Reloaded'
@@ -15,8 +17,32 @@ super + alt + r
 	bspc wm --restart && notify-send 'bspwm' 'Reloaded'
 
 super + c
-	{killall picom && notify-send 'picom' 'Stopped',\
+	{killall picom && notify-send 'picom' 'Stopped' ,\
 	notify-send 'picom' 'Started' && picom}
+
+super + BackSpace
+	notify-send 'Good night' 'Turning off monitors'; \
+	sleep 5; \
+	xset dpms force off
+
+super + shift + BackSpace
+	{xrandr --output DP-0 --off && \
+	notify-send 'xrandr' 'Right monitor disabled' \
+	,\
+	xrandr --output DP-4 --pos 0x1140 --output DP-0 --auto --rotation right --pos 3840x0 && \
+	notify-send 'xrandr' 'Right monitor enabled'}
+
+super + bracketleft
+	sudo ddcutil setvcp 10 30 --bus 7 & \
+	sudo ddcutil setvcp 10 25 --bus 9
+
+super + bracketright
+	sudo ddcutil setvcp 10 70 --bus 7 & \
+	sudo ddcutil setvcp 10 60 --bus 9
+
+super + braceleft
+	sudo ddcutil setvcp 10 0 --bus 7 & \
+	sudo ddcutil setvcp 10 5 --bus 9
 # }}}
 
 # open {{{
@@ -24,8 +50,8 @@ super + Return
 	$TERMINAL
 
 super + Escape
-	pid="$(xdotool search --class 'scratchpad')";\
-	bspc node "$pid" --flag hidden;\
+	pid="$(xdotool search --class 'scratchpad')"; \
+	bspc node "$pid" --flag hidden; \
 	bspc node "$pid" --focus
 
 super + space
@@ -35,25 +61,18 @@ super + f
 	firefox
 
 super + a
-	bspc desktop --focus DVI-D-0:^1; bspc desktop --focus DP-4:^2;\
+	bspc desktop --focus DP-0:^12; \
 	pgrep -fx 'python3 /usr/bin/anki' || anki
 
 super + y
-	bspc desktop --focus DP-4:^3;\
+	bspc desktop --focus DP-4:^3; \
 	pgrep -fx 'python -OO /opt/hydrus/client.pyw' || hydrus-client
 
 super + d
 	discord
 
-super + shift + x
-	if ! pgrep genymotion-play; then \
-		notify-send 'genymotion' 'Starting Azur Lane...';\
-		genymotion-player --vm-name AL &\
-		sleep 25; adb shell monkey -p com.YoStarJP.AzurLane 1;\
-		sleep 20; adb shell input tap 100 100;\
-		sleep 3; adb shell input tap 100 100;\
-		sleep 1; bspc desktop --activate DVI-D-0:^2;\
-	else genymotion-player --vm-name AL --poweroff; fi
+super + {shift,_} + x
+	{genymotion-player --vm-name AL --poweroff,azurlane}
 # }}}
 
 # media {{{
@@ -133,8 +152,8 @@ super + {Tab,grave}
 	bspc {node,desktop} --focus last
 
 super + {o,i}
-	bspc wm --record-history off;\
-	bspc node {older,newer} --follow f;\
+	bspc wm --record-history off; \
+	bspc node {older,newer} --follow f; \
 	bspc wm --record-history on
 
 super + control + {h,j,k,l,space}
@@ -159,14 +178,20 @@ super + z
 super + {_,shift} + {1-9,0}
 	bspc {desktop --focus,node --to-desktop} focused:^{1-9,10}
 
+super + {minus,equal}
+	bspc desktop --focus DP-0:^{11,12}
+
 super + {_,shift} + backslash
 	bspc {desktop --focus,node --to-desktop} next:focused
 # }}}
 
 # misc {{{
 super + F1
-	{polybar-msg cmd hide; bspc config -m DP-4 top_padding 0 ,\
-	polybar-msg cmd show; bspc config -m DP-4 top_padding 35}
+	{polybar-msg cmd hide; \
+	bspc config -m DP-4 top_padding 0 \
+	,\
+	polybar-msg cmd show; \
+	bspc config -m DP-4 top_padding 35}
 
 super + {F2,F3}
 	bspc config -m DP-4 window_gap $(($(bspc config -m DP-4 window_gap) {-,+} 5))
@@ -175,11 +200,7 @@ super + shift + {F2,F3}
 	bspc config -m DP-4 window_gap {0,30}
 
 super + F4
-	{bspc config border_width 0,\
+	{bspc config border_width 0 ,\
 	bspc config border_width 7}
 # }}}
 # }}}
-
-super + x
-	{adb shell input keyevent 26 && sleep 3 && pkill -STOP VBoxHeadless && notify-send 'Genymotion' 'Paused',\
-	pkill -CONT VBoxHeadless && sleep 3 && adb shell input keyevent 26 && notify-send 'Genymotion' 'Unpaused'}
