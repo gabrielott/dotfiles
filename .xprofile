@@ -1,15 +1,29 @@
-xrandr --output DP-4 --pos 0x1140 --output DP-0 --rotation right --pos 3840x0
+#!/bin/sh
 
+# Monitor layout setup
+xrandr --output DP-4 --pos 0x1140 --output DP-0 --rotation right --pos 3840x0 --output HDMI-0 --off
+
+# CTL-490 settings
+xsetwacom set 'Wacom Intuos S 2 Pen stylus' MapToOutput HEAD-1
+xsetwacom set 'Wacom Intuos S 2 Pen stylus' Area 0 0 7600 4750
+xsetwacom set 'Wacom Intuos S 2 Pen stylus' RawSample 1
+xsetwacom set 'Wacom Intuos S 2 Pen stylus' Suppress 0
+xsetwacom set 'Wacom Intuos S 2 Pad pad' Button 8 'key PgDn'
+xsetwacom set 'Wacom Intuos S 2 Pad pad' Button 9 'key PgUp'
+xsetwacom set 'Wacom Intuos S 2 Pad pad' Button 1 'key f3'
+xsetwacom set 'Wacom Intuos S 2 Pad pad' Button 3 'key f4'
+
+# Basic programs
+wal -R &
 fcitx &
 sxhkd &
 picom &
-polybar -r mybar &
 dunst &
-wal -R &
-anki &
+polybar -r mybar &
+set-wallpaper
 [ ! -s ~/stuff2/mpd/pid ] && mpd &
 
-sleep 2
+sleep 5
 # Anything that depends on some program above should come after this comment
 
 xkbcomp -I"$HOME/.config/xkb" "$HOME/.config/xkb/base.xkb" $DISPLAY
