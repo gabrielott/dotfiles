@@ -1,6 +1,9 @@
 #!/bin/sh
 
-if ! pgrep -f 'genymotion-player' > /dev/null 2>&1; then
+bspc desktop --focus DP-0:^13
+
+# If the VM isn't already running, run it and open AL
+if ! pgrep -f 'genymotion/play' > /dev/null 2>&1; then
 	notify-send 'genymotion' 'Starting Azur Lane...'
 	bspc desktop --activate DP-0:^13
 	genymotion-player --vm-name AL &
@@ -10,19 +13,25 @@ if ! pgrep -f 'genymotion-player' > /dev/null 2>&1; then
 	adb shell input tap 100 100
 	sleep 5
 	adb shell input tap 100 100
-else
-	bspc desktop --focus DP-0:^13
+fi
+
+# If the VM is paused, unpause it
+if pgrep -r T VBoxHeadless > /dev/null 2>&1; then
 	pkill -CONT VBoxHeadless
-	sleep 1
+	sleep 2
 	adb shell input keyevent 26
 fi
 
-bspc subscribe | while read -r line; do
-	value="$(echo "$line" | sed 's/.*\(.\)ア.*/\1/')"
-	if [ "$value" = o ] && ! pgrep -r T VBoxHeadless > /dev/null 2>&1; then
-		adb shell input keyevent 26
-		sleep 1
-		pkill -STOP VBoxHeadless
-		break
-	fi
-done
+# If there isn't already another process doing this, wait until the VM's
+# desktop isn't visible and pause it.
+if ! pidof -xo '%PPID' "$0" > /dev/null 2>&1; then
+	bspc subscribe | while read -r line; do
+		value="$(echo "$line" | sed 's/.*\(.\)ア.*/\1/')"
+		if [ "$value" = o ] && ! pgrep -r T VBoxHeadless > /dev/null 2>&1; then
+			adb shell input keyevent 26
+			sleep 2
+			pkill -STOP VBoxHeadless
+			break
+		fi
+	done
+fi
