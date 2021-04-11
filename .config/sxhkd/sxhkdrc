@@ -29,8 +29,16 @@ super + shift + BackSpace
 	{xrandr --output DP-0 --off && \
 	notify-send 'xrandr' 'Right monitor disabled' \
 	,\
-	xrandr --output DP-4 --pos 0x1140 --output DP-0 --auto --rotation right --pos 3840x0 && \
+	xrandr --output DP-4 --pos 0x1140 --output DP-0 --auto --rotation right --pos 3840x0 --output HDMI-0 --pos 6000x1380 && \
 	notify-send 'xrandr' 'Right monitor enabled'}
+
+super + alt + BackSpace
+	{xrandr --output DP-4 --pos 0x1140 --output DP-0 --rotation right --pos 3840x0 --output HDMI-0 --auto --pos 6000x1380 && \
+	notify-send 'xrandr' 'TV enabled' \
+	,\
+	xrandr --output HDMI-0 --off && \
+	bspc monitor HDMI-0 --remove && \
+	notify-send 'xrandr' 'TV disabled'}
 
 super + bracketleft
 	sudo ddcutil setvcp 10 30 --bus 7 & \
@@ -43,6 +51,10 @@ super + bracketright
 super + braceleft
 	sudo ddcutil setvcp 10 0 --bus 7 & \
 	sudo ddcutil setvcp 10 5 --bus 9
+
+super + braceright
+	sudo ddcutil setvcp 10 100 --bus 7 & \
+	sudo ddcutil setvcp 10 100 --bus 9
 # }}}
 
 # open {{{
