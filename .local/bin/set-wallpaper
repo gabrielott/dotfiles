@@ -1,0 +1,24 @@
+#!/bin/sh
+mkdir -p "$XDG_CONFIG_HOME/wallpaper"
+case $# in
+	0)
+		HORIZONTAL="$XDG_CONFIG_HOME/wallpaper/h"
+		VERTICAL="$XDG_CONFIG_HOME/wallpaper/v"
+		if [ ! -f "$HORIZONTAL" ] || [ ! -f "$VERTICAL" ]; then
+			echo 'Wallpaper has never been set before.'
+			exit 1
+		fi
+		;;
+	2)
+		HORIZONTAL="$1"
+		VERTICAL="$2"
+		cp "$HORIZONTAL" "$XDG_CONFIG_HOME/wallpaper/h"
+		cp "$VERTICAL" "$XDG_CONFIG_HOME/wallpaper/v"
+		;;
+	*)
+		echo 'Usage: set-wallpaper HORIZONTAL VERTICAL'
+		exit 1
+		;;
+esac
+
+xwallpaper --output DP-4 --center "$HORIZONTAL" --output DP-0 --center "$VERTICAL"
