@@ -21,4 +21,4 @@ case $# in
 		;;
 esac
 
-xwallpaper --output DP-4 --center "$HORIZONTAL" --output DP-0 --center "$VERTICAL"
+xwallpaper --output DP-4 --zoom "$HORIZONTAL" --output DP-0 --zoom "$VERTICAL"
