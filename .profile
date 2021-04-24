@@ -4,10 +4,10 @@
 export PATH="$PATH":"$HOME/.local/bin"
 
 # Default programs
-export EDITOR='vim'
-export TERMINAL='st'
-export BROWSER='firefox'
-export FILE='lf-ueberzug'
+export EDITOR=vim
+export TERMINAL=st
+export BROWSER=firefox
+export FILE=lf-ueberzug
 
 # Sets fcitx as input method for japanese
 export GTK_IM_MODULE=fcitx
@@ -21,6 +21,7 @@ export XCOMPOSEFILE="$HOME/.config/xkb/compose"
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_CACHE_HOME="$HOME/.cache"
+export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
 export INPUTRC="$XDG_CONFIG_HOME/inputrc"
 export GTK2_RC_FILES="$XDG_CONFIG_HOME/gtk-2.0/gtkrc-2.0"
 export CARGO_HOME="$XDG_CONFIG_HOME/cargo"
