@@ -3,6 +3,9 @@ import sys
 import subprocess
 import argparse
 
+# Displays a video mosaic with ffmpeg and mpv.
+# Use -h for more info.
+
 def make_ffmpeg_args(files, rows, cols, final_width, final_height):
     width = final_width // cols
     height = final_height // rows

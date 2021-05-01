@@ -1,4 +1,9 @@
 #!/bin/sh
+
+# Sets wallpapers for a horizotal and a vertical monitor.
+# If called with no arguments, the wallpapers previously set
+# are applied again.
+
 mkdir -p "$XDG_CONFIG_HOME/wallpaper"
 case $# in
 	0)

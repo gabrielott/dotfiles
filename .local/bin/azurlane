@@ -1,9 +1,11 @@
 #!/bin/sh
 
+# Starts a VM and runs Azur Lane.
+
 bspc desktop --focus DP-0:^13
 
 # If the VM isn't already running, run it and open AL
-if ! pgrep -f 'genymotion/play' > /dev/null 2>&1; then
+if ! pgrep -f 'genymotion-player' > /dev/null 2>&1; then
 	notify-send 'genymotion' 'Starting Azur Lane...'
 	bspc desktop --activate DP-0:^13
 	genymotion-player --vm-name AL &
