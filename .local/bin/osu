@@ -2,4 +2,4 @@
 
 # Runs osu!
 
-exec lutris:rungame/osu
+exec lutris lutris:rungame/osu
