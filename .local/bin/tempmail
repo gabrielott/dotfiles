@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Copies a temporary email to clipboard.
+
+curl -s https://10minutemail.com/session/address | sed 's/.*:"\(.*\)".*/\1/' | xclip -selection clipboard
+notify-send '10minutemail' 'Email copied to clipboard'
