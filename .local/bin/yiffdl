@@ -1,4 +1,4 @@
-#!/bin/python3
+#!/usr/bin/env python3
 
 # Downloads all posts from a creator in yiff.party
 # Use the flag --help to see a list of options.

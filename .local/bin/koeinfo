@@ -1,4 +1,4 @@
-#!/bin/python3
+#!/usr/bin/env python3
 
 # Scrapes a voice work's info from dlsite and prints it to stdout.
 

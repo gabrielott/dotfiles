@@ -1,4 +1,4 @@
-#!/bin/python3
+#!/usr/bin/env python3
 
 # Renames all files given as arguments to "track#-title.ext".
 # The track and title data is extracted from the files' id3 tags.

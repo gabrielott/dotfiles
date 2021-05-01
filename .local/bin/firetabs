@@ -1,4 +1,4 @@
-#!/bin/python3
+#!/usr/bin/env python3
 
 # Prints the titles and urls of all tabs currently open in firefox to stdout.
 
