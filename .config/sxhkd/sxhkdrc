@@ -29,7 +29,7 @@ super + shift + BackSpace
 	{xrandr --output DP-0 --off && \
 	notify-send 'xrandr' 'Right monitor disabled' \
 	,\
-	xrandr --output DP-4 --pos 0x1140 --output DP-0 --auto --rotation right --pos 3840x0 --output HDMI-0 --pos 6000x1380 && \
+	xrandr --output DP-4 --pos 0x1140 --panning 0x0 --output DP-0 --auto --rotation right --pos 3840x0 --output HDMI-0 --pos 6000x1380 && \
 	notify-send 'xrandr' 'Right monitor enabled'}
 
 super + alt + BackSpace
