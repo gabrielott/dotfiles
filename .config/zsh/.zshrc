@@ -66,7 +66,7 @@ hash -d p=~/projects
 hash -d t=~/stuff/torrents
 hash -d ufrj=~/projects/ufrj
 
-# Aliases
+# Default options
 alias ls='ls -hF --color=auto'
 alias grep='grep --color=auto'
 alias mkdir='mkdir -pv'
@@ -76,5 +76,10 @@ alias rm='rm -Iv'
 alias du='du -hc'
 alias df='df -h'
 alias free='free -h'
-
+# Stop programs from spamming version/copyright info
+alias python='python -q'
+alias julia='julia -q'
+alias pwsh='pwsh -NoLogo'
+alias ffmpeg='ffmpeg -hide_banner'
+# Start lf with custom script
 alias lf='lf-ueberzug'
