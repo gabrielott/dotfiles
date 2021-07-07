@@ -45,6 +45,7 @@ let g:gruvbox_contrast_dark = 'hard'
 set encoding=utf-8
 set fileencodings=ucs-bom,uft-8,default,sjis
 set number
+set relativenumber
 set autoindent
 set ruler
 set cursorline

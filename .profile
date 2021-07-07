@@ -17,6 +17,9 @@ export XMODIFIERS=@im=fcitx
 # XKB compose file
 export XCOMPOSEFILE="$HOME/.config/xkb/compose"
 
+# Scale Java programs such as Burp Suite
+export _JAVA_OPTIONS="-Dsun.java2d.uiScale=2"
+
 # Please stop storing config files in $HOME by default :(
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_DATA_HOME="$HOME/.local/share"

@@ -3,4 +3,4 @@
 # Converts every file it receives as an argument to flac concurrently.
 # Files can also be sent via stdin.
 
-parallel -k --bar ffmpeg -i '{}' -c:a flac '{.}.flac' ::: "$@"
+parallel -k --bar ffmpeg -hide_banner -i '{}' -c:a flac '{.}.flac' ::: "$@"

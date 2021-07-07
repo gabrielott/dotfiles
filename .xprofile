@@ -14,12 +14,13 @@ xsetwacom set 'Wacom Intuos S 2 Pad pad' Button 1 'key f3'
 xsetwacom set 'Wacom Intuos S 2 Pad pad' Button 3 'key f4'
 
 # Basic programs
-wal -R &
+systembus-notify &
+polybar -rn mybar &
 fcitx &
 sxhkd &
 picom &
 dunst &
-polybar -r mybar &
+wal -R &
 set-wallpaper
 [ ! -s ~/stuff2/mpd/pid ] && mpd &
 
