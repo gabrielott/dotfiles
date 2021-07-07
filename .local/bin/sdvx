@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# Runs unnamed-sdvx-clone
+
+USC_PATH=/opt/unnamed-sdvx-clone
+cd "$USC_PATH"
+exec ./usc-game
