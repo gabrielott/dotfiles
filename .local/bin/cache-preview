@@ -1,51 +1,44 @@
-#!/bin/sh
+#!/usr/bin/env bash
+# Bash is required because exporting functions isn't in the POSIX spec.
+# An alternative would be breaking this script into two files, so that
+# exporting a function isn't necessary.
 
-# Caches the preview of a file if it's not already cached. Files are received as arguments and the path to the cached preview of
-# each file is printed to stdout. The order of the paths is not guaranteed to be same as the order of the arguments. If the
-# processing of any file fails, the file will be skipped and the final exit code will be an error.
-
-create_cache_dir() { mkdir -p "$HOME"'/.cache/lf-ueberzug/'"$(dirname "$file")"; }
+# Caches the preview of a file if it's not already cached. Files are
+# received as arguments and the path to the cached preview of each
+# file is printed to stdout. If the processing of any file fails,
+# the file will be skipped and the final exit code will be an error.
 
 create_cache() {
 	file="$1"
 	[ -e "$file" ] || return 1;
 	file="$(realpath "$file")"
 
-	cache_path="$HOME"'/.cache/lf-ueberzug/'"$file"
-	[ -e "$cache_path" ] && { echo "$cache_path"; return 0; }
+	cache_dir="$HOME/.cache/lf-ueberzug/$(dirname "$file")"
+	cache="$cache_dir/$(ext -n "$file").prevcache"
+	[ -e "$cache" ] && { echo "$cache"; return 0; }
+
+	mkdir -p "$cache_dir"
 
 	case "$file" in
 		*.png|*.jpg|*.jpeg)
-			create_cache_dir
-			cp "$file" "$cache_path" || return 1
+			cp "$file" "$cache"
 			;;
 		*.mkv|*.mp4|*.wmv|*.avi|*.mpg|*.mpeg|*.mov|*.webm|*.m4v|*.m2v)
-			create_cache_dir
-			ffmpeg -ss 00:00:15.000 -i "$file" -vframes 1 -f image2 "$cache_path" > /dev/null 2>&1 || return 1
+			# ffmpeg -ss 00:00:15.000 -i "$file" -vframes 1 -f image2 "$cache" > /dev/null 2>&1 || return 1
+			mt --disable-timestamps=true --header=false --padding=0 --width=960 --skip-credits=true \
+				--fast=true --numcaps=16 --output="$cache.jpg" "$file" > /dev/null 2>&1 || return 1
+			mv "$cache.jpg" "$cache"
 			;;
 		*.cbz)
-			cover="$(unzip -l "$file" | tail -n +4 | head -n -2 | awk '{print $4}' | sort -n | head -n 1)"
-			echo "$cover" | grep '.png$\|.jpg$\|.jpeg$\|.gif$' > /dev/null 2>&1 || return 1
-			create_cache_dir
-			unzip -p "$file" "$cover" > "$cache_path" || return 1
+			cover="$(unzip -Z1 "$file" | sort -n | head -n1)"
+			echo "$cover" | grep -i '.png$\|.jpg$\|.jpeg$\|.gif$' > /dev/null 2>&1 || return 1
+			unzip -p "$file" "$cover" > "$cache"
 			;;
 		*) return 1 ;;
 	esac
 
-	echo "$cache_path"
+	echo "$cache"
 }
 
-pids=""
-while [ $# -gt 0 ]; do
-	[ $(($# % 10)) = 0 ] && wait
-	create_cache "$1" &
-	pids="$pids $!"
-	shift
-done
-
-err=0
-for pid in $pids; do
-	wait "$pid" || err=1
-done
-
-exit "$err"
+export -f create_cache
+parallel -k create_cache '{}' ::: "$@"

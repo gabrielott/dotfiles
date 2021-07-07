@@ -28,7 +28,7 @@ if [ "$action" = 'add' ]; then
 			"path": "$path" \
 		}
 		EOF
-elif [ "$1" = 'remove' ]; then
+elif [ "$action" = 'remove' ]; then
 	cat <<- EOF > "$FIFO_UEBERZUG"
 		{ \
 			"action": "remove", \
