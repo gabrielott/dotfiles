@@ -61,6 +61,7 @@ fi
 # Named directories
 hash -d s=~/stuff
 hash -d S=~/stuff2
+hash -d ss=~/ssd
 hash -d d=~/drive
 hash -d p=~/projects
 hash -d t=~/stuff/torrents
@@ -76,10 +77,23 @@ alias rm='rm -Iv'
 alias du='du -hc'
 alias df='df -h'
 alias free='free -h'
+alias zathura='zathura --fork'
+
 # Stop programs from spamming version/copyright info
 alias python='python -q'
 alias julia='julia -q'
 alias pwsh='pwsh -NoLogo'
 alias ffmpeg='ffmpeg -hide_banner'
+alias ffprobe='ffprobe -hide_banner'
+
 # Start lf with custom script
 alias lf='lf-ueberzug'
+
+# Shortcuts
+alias proj='cd_into_dir ~p'
+alias ufrj='cd_into_dir ~ufrj'
+
+# Functions
+cd_into_dir() {
+	cd "$1/$(find "$1" -maxdepth 1 -type d | sed 's_.*/\(.*\)_\1_' | fzf)"
+}
