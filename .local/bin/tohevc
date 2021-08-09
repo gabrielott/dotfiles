@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+# Bash is required because exporting functions isn't in the POSIX spec.
+
+# Transcodes files to HEVC in order to save space. The quality should
+# be noticeably worse, but acceptable. Encoding is done using nvenc
+# and up to 3 videos will be transcoded concurrently.
+
+# File sizes by resolution for a 35 minute video:
+# - UHD: 2.23GB
+# - 4K: 2.1GB
+# - FHD: 918MB
+# - HD: 393MB
+# - 480p: 131MB
+# - Worse than 480p: 52MB
+# - Anything that doesn't fit the resolutions above exactly: 918MB
+
+transcode() {
+	# Bitrates for each resolution:
+	# BITRATE_TRASH is used for resolutions worse than 480p
+	# and BITRATE_DEFAULT is used for anything that doesn't
+	# match the other ones.
+	BITRATE_DEFAULT=3500000
+	BITRATE_UHD=8500000
+	BITRATE_4K=8000000
+	BITRATE_FHD=3500000
+	BITRATE_HD=1500000
+	BITRATE_SD=500000
+	BITRATE_TRASH=200000
+
+	# If the bitrate of the video multiplied by TRANSCODE_THRESHOLD
+	# is less than the bitrate we would use, we don't actually
+	# transcode it.
+	TRANSCODE_THRESHOLD=1.1
+
+	file="$1"
+	out="$2"
+
+	info="$(ffprobe \
+		-v error \
+		-select_streams v:0 \
+		-show_entries stream=width,bit_rate \
+		-of default=noprint_wrappers=1 \
+		"$file" \
+		| sed 's/.*=//' \
+		| tr '\n' '/')"
+	width="$(echo "$info" | cut -d'/' -f1)"
+	bitrate="$(echo "$info" | cut -d'/' -f2)"
+
+	new_bitrate="$BITRATE_DEFAULT"
+	case "$width" in
+		4096) new_bitrate="$BITRATE_UHD" ;;
+		2160) new_bitrate="$BITRATE_4K" ;;
+		1920) new_bitrate="$BITRATE_FHD" ;;
+		1280) new_bitrate="$BITRATE_HD" ;;
+		854) new_bitrate="$BITRATE_SD" ;;
+		*) [ "$bitrate" -lt 854 ] && new_bitrate="$BITRATE_TRASH" ;;
+	esac
+
+	# If the bitrate is already low enough, we just change
+	# the extension to conf.ext, no need to transcode.
+	effective_bitrate="$(awk "BEGIN {print int($TRANSCODE_THRESHOLD * $bitrate)}")"
+	if [ "$bitrate" -le "$new_bitrate" ]; then
+		echo "Won't transcode $file, bitrate already low enough"
+		ext="$(ext "$file")"
+		rex "$file" "conf.$ext"
+		return
+	fi
+
+	echo "Starting file $file with bitrate $new_bitrate"
+
+	ffmpeg \
+		-hide_banner \
+		-y \
+		-v error \
+		-i "$file" \
+		-c:v hevc_nvenc \
+		-b:v "$new_bitrate" \
+		-c:a copy \
+		"$out"
+
+	echo "File $file done"
+}
+
+export -f transcode
+parallel -j3 --bar transcode '{}' '{.}.conv.mp4' ::: "$@"
