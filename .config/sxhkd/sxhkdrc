@@ -1,30 +1,41 @@
 # vim: foldmethod=marker
 
 # system {{{
+
+# Exit bspwm
 super + shift + q
 	bspc quit
 
+# Start win10 VM
+# FIXME: Killing the android VM doesn't work
 super + alt + q
 	pgrep -fx '/opt/genymotion/player --vm-name 5558d302-efea-430e-9ab6-2eca6dcad732' && \
 	genymotion-player --vm-name AL --poweroff && \
 	sleep 1; \
 	sudo virsh start win10
 	
+# Reload sxhkd
 super + shift + r
 	pkill -USR1 -x sxhkd && notify-send 'sxhkd' 'Reloaded'
 
+# Reload bspwm
 super + alt + r
 	bspc wm --restart && notify-send 'bspwm' 'Reloaded'
 
-super + c
+# Toggle start/kill picom
+@super + c
 	{killall picom && notify-send 'picom' 'Stopped' ,\
 	notify-send 'picom' 'Started' && picom}
 
+
+# Put monitors to sleep
 super + BackSpace
 	notify-send 'Good night' 'Turning off monitors'; \
 	sleep 5; \
 	xset dpms force off
 
+# Toggle right monitor
+# Enabled by default
 super + shift + BackSpace
 	{xrandr --output DP-0 --off && \
 	notify-send 'xrandr' 'Right monitor disabled' \
@@ -32,6 +43,8 @@ super + shift + BackSpace
 	xrandr --output DP-4 --pos 0x1140 --panning 0x0 --output DP-0 --auto --rotation right --pos 3840x0 --output HDMI-0 --pos 6000x1380 && \
 	notify-send 'xrandr' 'Right monitor enabled'}
 
+# Toggle TV
+# Disabled by default
 super + alt + BackSpace
 	{xrandr --output DP-4 --pos 0x1140 --output DP-0 --rotation right --pos 3840x0 --output HDMI-0 --auto --pos 6000x1380 && \
 	notify-send 'xrandr' 'TV enabled' \
@@ -40,164 +53,193 @@ super + alt + BackSpace
 	bspc monitor HDMI-0 --remove && \
 	notify-send 'xrandr' 'TV disabled'}
 
+# Medium-low brightness
 super + bracketleft
+	sudo ddcutil setvcp 10 20 --bus 7 & \
+	sudo ddcutil setvcp 10 15 --bus 9
+
+# Medium-high brightness
+super + bracketright
 	sudo ddcutil setvcp 10 30 --bus 7 & \
 	sudo ddcutil setvcp 10 25 --bus 9
 
-super + bracketright
-	sudo ddcutil setvcp 10 70 --bus 7 & \
-	sudo ddcutil setvcp 10 60 --bus 9
-
+# Low brightness
 super + braceleft
 	sudo ddcutil setvcp 10 0 --bus 7 & \
 	sudo ddcutil setvcp 10 5 --bus 9
 
+# High brightness
 super + braceright
-	sudo ddcutil setvcp 10 100 --bus 7 & \
-	sudo ddcutil setvcp 10 100 --bus 9
+	sudo ddcutil setvcp 10 70 --bus 7 & \
+	sudo ddcutil setvcp 10 60 --bus 9
 # }}}
 
 # open {{{
+
+# Open terminal
 super + Return
 	$TERMINAL
 
-super + Escape
-	pid="$(xdotool search --class 'scratchpad')"; \
-	bspc node "$pid" --flag hidden; \
-	bspc node "$pid" --focus
-
+# Open dmenu
 super + space
 	dmenu_run
 
+# Open Firefox
 super + f
 	firefox
 
+# Open Anki & Migaku Dictionary
 super + a
 	bspc desktop --focus DP-0:^12; \
 	pgrep -fx 'python3 /usr/bin/anki' || anki
 
-super + y
-	bspc desktop --focus DP-4:^3; \
-	pgrep -fx 'python -OO /opt/hydrus/client.pyw' || hydrus-client
-
+# Open Discord
 super + d
 	discord
 
+# Open Azur Lane
 super + {shift,_} + x
 	{genymotion-player --vm-name AL --poweroff,azurlane}
 # }}}
 
 # media {{{
+
+# Volume up
 {_,control,shift} + XF86AudioRaiseVolume
 	pactl set-sink-volume alsa_output.pci-0000_0d_00.3.analog-stereo +{5,1,10}%
 
+# Volume down
 {_,control,shift} + XF86AudioLowerVolume
 	pactl set-sink-volume alsa_output.pci-0000_0d_00.3.analog-stereo -{5,1,10}%
 
+# MPC volume up
 super + {_,control,shift} + XF86AudioRaiseVolume
 	mpc volume +{5,1,10}
 
+# MPC volume down
 super + {_,control,shift} + XF86AudioLowerVolume
 	mpc volume -{5,1,10}
 
+# Mute
 XF86AudioMute
 	pactl set-sink-mute alsa_output.pci-0000_0d_00.3.analog-stereo toggle
 
+# Restart song
 super + XF86AudioMute
 	mpc seek 0
 
+# Prev/next song
 XF86Audio{Prev,Next}
 	mpc {prev,next}
 
+# Seek song backwards
 super + {_,control,shift} XF86AudioPrev
 	mpc seek -{10,5,30}
 
+# Seek song forwards
 super + {_,control,shift} XF86AudioNext
 	mpc seek +{10,5,30}
 
+# Play/pause/stop song
 {_,shift} + XF86AudioPlay
 	mpc {toggle,stop}
 
+# Seek song to exact time
 control + XF86AudioPlay
 	dmenu -p 'Enter time to seek to' | xargs mpc seek
 
+# Pick a song/album
 super + {_,control,shift} + XF86AudioPlay
 	$TERMINAL -c 'pick-song' -e pick-song {_,-q,-b}
 
+# Play current video in MPV
 super + {_,shift} + v
 	tabs-mpv {_,--no-video}
 
+# Select a portion of the screen and screenshot
 @Print
 	scrot -s
 
+# Screenshot current window
 shift + Print
 	scrot -u
 # }}}
 
 # window management {{{
 # nodes {{{
+
+# Close current node
 super + q
 	bspc node --close
 
+# Monacle layout
 super + m
 	bspc desktop --layout next
 
+# Change current node state
 super + s; {t,shift + t,l,f}
 	bspc node focused --state {tiled,pseudo_tiled,floating,fullscreen}
 
+# Change current node flags
 super + g; {h,m,l,s,p}
 	bspc node focused --flag {hidden,marked,locked,sticky,private}
 
+# Unhide all nodes
 super + g; shift + h
 	bspc node any.hidden --flag hidden
 
+# Focus/move node
 super + {_,shift} + {h,j,k,l}
 	bspc node focused --{focus,swap} {west,south,north,east}
 
+# Go to parent/brother/child of current node
 super + {p,b,comma,period}
 	bspc node focused --focus @{parent,brother,first,second}
 
+# Focus next node in current desktop
 super + {_,shift} + n
 	bspc node focused --focus {next,prev}.local
 
-super + {Tab,grave}
-	bspc {node,desktop} --focus last
+# Focus last desktop
+super + Tab
+	bspc desktop --focus last
 
-super + {o,i}
-	bspc wm --record-history off; \
-	bspc node {older,newer} --follow f; \
-	bspc wm --record-history on
-
+# Preselect a direction in current node
 super + control + {h,j,k,l,space}
-	bspc node --presel-dir {west,south,north,east,cancel}
+	bspc node focused --presel-dir {west,south,north,east,cancel}
 
+# Resize preselection
 super + control + {1-9}
-	bspc node --presel-ratio 0.{1-9}
+	bspc node focused --presel-ratio 0.{1-9}
 
+# Resize current node
 super + alt + {h,j,k,l}
-	bspc node --resize {left -40 0,bottom 0 40,top 0 -40,right 40 0}
+	bspc node focused --resize {left -40 0,bottom 0 40,top 0 -40,right 40 0}
 
-super + t
-	bspc node newest.marked.local --to-node newest.!automatic.local || \
-	bspc node focused --to-node newest.!automatic
-
+# Swap focused node with biggest node in focused desktop
 super + z
 	bspc node focused --swap biggest.window.local
 
 # }}}
 
 # desktops {{{
+
+# Select desktop / move node to desktop
 super + {_,shift} + {1-9,0}
 	bspc {desktop --focus,node --to-desktop} focused:^{1-9,10}
 
+# Select special desktop
 super + {minus,equal}
 	bspc desktop --focus DP-0:^{11,12}
 
+# Select monitor / move node to monitor
 super + {_,shift} + backslash
 	bspc {desktop --focus,node --to-desktop} next:focused
 # }}}
 
 # misc {{{
+
+# Toggle bar
 super + F1
 	{polybar-msg cmd hide; \
 	bspc config -m DP-4 top_padding 0 \
@@ -205,14 +247,29 @@ super + F1
 	polybar-msg cmd show; \
 	bspc config -m DP-4 top_padding 35}
 
+# Increase/decrease gaps
 super + {F2,F3}
 	bspc config -m DP-4 window_gap $(($(bspc config -m DP-4 window_gap) {-,+} 5))
 
+# Set gaps to 0/30
 super + shift + {F2,F3}
 	bspc config -m DP-4 window_gap {0,30}
 
+# Toggle borders
 super + F4
 	{bspc config border_width 0 ,\
-	bspc config border_width 7}
+	bspc config border_width 4}
 # }}}
+# }}}
+
+# mouse {{{
+
+# Next occupied desktop in focused monitor
+super + shift + control + alt + 1
+	bspc desktop --focus next.local.occupied
+
+# Previous occupied desktop in focused monitor
+super + shift + control + alt + 2
+	bspc desktop --focus prev.local.occupied
+
 # }}}
