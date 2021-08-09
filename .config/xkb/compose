@@ -1,0 +1,10 @@
+include "%L"
+
+<Multi_key> <less> <greater>    : "↔" U2194
+<Multi_key> <slash> <backslash> : "∧" U2227
+<Multi_key> <backslash> <slash> : "∨" U2228
+<Multi_key> <minus> <bar>       : "⊤" U22A4
+<Multi_key> <bar> <minus>       : "⊥" U22A5
+<Multi_key> <tilde> <tilde>     : "≈" U2248
+<Multi_key> <minus> <minus> <a> : "ª" U00AA
+<Multi_key> <minus> <minus> <b> : "º" U00BA
