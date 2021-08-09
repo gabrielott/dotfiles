@@ -20,7 +20,7 @@ export XCOMPOSEFILE="$HOME/.config/xkb/compose"
 # Scale Java programs such as Burp Suite
 export _JAVA_OPTIONS="-Dsun.java2d.uiScale=2"
 
-# Please stop storing config files in $HOME by default :(
+# Please stop storing random files in $HOME by default :(
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_CACHE_HOME="$HOME/.cache"
@@ -35,6 +35,7 @@ export GNUPGHOME="$XDG_CONFIG_HOME/gnupg"
 export LESSHISTFILE="$XDG_CONFIG_HOME/lesshst"
 export __GL_SHADER_DISK_CACHE_PATH="$XDG_CACHE_HOME/nv/GLCache"
 export CUDA_CACHE_PATH="$XDG_CACHE_HOME/nv/ComputeCache"
+export SQLITE_HISTORY="$XDG_CACHE_HOME/sqlite/sqlite_history"
 
 PS1='[\u@\h \W]\$ '
 

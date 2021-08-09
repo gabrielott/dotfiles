@@ -15,7 +15,6 @@ xsetwacom set 'Wacom Intuos S 2 Pad pad' Button 3 'key f4'
 
 # Basic programs
 systembus-notify &
-polybar -rn mybar &
 fcitx &
 sxhkd &
 picom &
@@ -27,4 +26,5 @@ set-wallpaper
 sleep 5
 # Anything that depends on some program above should come after this comment
 
-xkbcomp -I"$HOME/.config/xkb" "$HOME/.config/xkb/base.xkb" $DISPLAY
+# xkbcomp -I"$HOME/.config/xkb" "$HOME/.config/xkb/base.xkb" $DISPLAY
+polybar -rn mybar &
