@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Decodes base64 text in the clipboard.
+# The decoded result is saved to the clipboard.
+
+xclip -o -selection clipboard | base64 -d | xclip -i -selection clipboard
