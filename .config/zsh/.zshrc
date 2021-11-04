@@ -4,12 +4,16 @@
 PS1='%B%1~$%b '
 PROMPT_EOL_MARK='%B%K{red}\n%k%b'
 KEYTIMEOUT=5
+KEYBOARD_HACK=\'           # remove a trailing quote when there's an odd number of them on the line
 setopt auto_cd             # cd without typing cd
 setopt mark_dirs           # put a / when expanding directories
 setopt no_unset            # error when an unset variable is used
+setopt csh_null_glob       # ignore patterns with no matches; error if all patterns have no matches
 setopt append_history      # append to the history file instead of replacing it
 setopt extended_history    # include time and duration of each command to the history file
-setopt extended_glob       # allows ^, ~, # and ## to be used in filename generation
+setopt extended_glob       # allow ^, ~, # and ## to be used in filename generation
+setopt correct             # suggest a correction when a non-existent command is used
+setopt bsd_echo            # disable escape sequences in echo unless -e is used (like bash)
 
 # Save history for a long time
 HISTFILE=~/.cache/zsh/histfile
@@ -69,7 +73,7 @@ hash -d ufrj=~/projects/ufrj
 
 # Default options
 alias ls='ls -hF --color=auto'
-alias grep='grep --color=auto'
+alias grep='grep --color=auto -nT'
 alias mkdir='mkdir -pv'
 alias cp='cp -iv'
 alias mv='mv -iv'
@@ -85,15 +89,23 @@ alias julia='julia -q'
 alias pwsh='pwsh -NoLogo'
 alias ffmpeg='ffmpeg -hide_banner'
 alias ffprobe='ffprobe -hide_banner'
+alias gdb='gdb -q'
 
 # Start lf with custom script
 alias lf='lf-ueberzug'
 
 # Shortcuts
-alias proj='cd_into_dir ~p'
-alias ufrj='cd_into_dir ~ufrj'
+alias proj='fzf_cd_into_dir ~p'
+alias ufrj='fzf_cd_into_dir ~ufrj'
+alias lbin='fzf_edit_file_in_dir ~/.local/bin/'
+alias clipboard='xclip -selection clipboard'
+alias gef='gdb -q -ex "source /usr/share/gef/gef.py"'
 
 # Functions
-cd_into_dir() {
+fzf_cd_into_dir() {
 	cd "$1/$(find "$1" -maxdepth 1 -type d | sed 's_.*/\(.*\)_\1_' | fzf)"
+}
+
+fzf_edit_file_in_dir() {
+	"$EDITOR" "$1$(find "$1" -maxdepth 1 -type f | sed 's_.*/\(.*\)_\1_' | fzf)"
 }
