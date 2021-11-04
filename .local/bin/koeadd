@@ -18,13 +18,13 @@ for dir in "$@"; do
 
 	code="$(echo "$dir" | grep -Eio 'RJ[0-9]{6}')"
 	if [ -z "$code" ]; then 
-		printf "Couldnt't figure out RJ code from filename %s.\n" "$dir"
+		printf "Couldn't figure out RJ code from filename %s.\n" "$dir"
 		err=1
 		continue
 	fi
 
-	if grep -i "$code" "$KOE_DIR/db/db" > /dev/null 2>&1; then
-		printf "Work with filename %s in already in the database.\n" "$dir"
+	if grep -i "^$code" "$KOE_DIR/db/db" > /dev/null 2>&1; then
+		printf "Work with code %s in already in the database.\n" "$dir"
 		err=1
 		continue
 	fi
