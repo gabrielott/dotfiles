@@ -19,7 +19,6 @@ fcitx &
 sxhkd &
 picom &
 dunst &
-wal -R &
 set-wallpaper
 [ ! -s ~/stuff2/mpd/pid ] && mpd &
 

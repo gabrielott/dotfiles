@@ -1,0 +1,11 @@
+#!/bin/sh
+
+win_id="$1"
+class="$2"
+instance="$3"
+intermediate="$4"
+
+props="$(xprop -id "$win_id")"
+if echo "$props" | grep '_NET_WM_NAME.*main' >/dev/null 2>&1; then
+	echo 'layer=normal'
+fi
