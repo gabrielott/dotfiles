@@ -10,22 +10,20 @@
 [ -z "$FIFO_UEBERZUG" ] && exit 1
 
 action="$1"
-path="$2"
-
-width=$(($(tput cols) / 2))
-height=$(($(tput lines) - 2))
 
 if [ "$action" = 'add' ]; then
 	cat <<- EOF > "$FIFO_UEBERZUG"
 		{ \
 			"action": "add", \
 			"identifier": "preview", \
-			"x": $width, \
-			"y": 1, \
-			"width": $width, \
-			"height": $height, \
+			"x": $5, \
+			"y": $6, \
+			"width": $3, \
+			"height": $4, \
 			"scaler": "fit_contain", \
-			"path": "$path" \
+			"scaling_position_x": 0.5, \
+			"scaling_position_y": 0.5, \
+			"path": "$2" \
 		}
 		EOF
 elif [ "$action" = 'remove' ]; then
