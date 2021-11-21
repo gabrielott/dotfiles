@@ -52,6 +52,15 @@ compinit -d ~/.cache/zsh/zcompdump
 bindkey '^R' history-incremental-pattern-search-backward
 bindkey '^P' history-beginning-search-backward
 bindkey '^N' history-beginning-search-forward
+# Edit command in vim with v
+autoload edit-command-line
+zle -N edit-command-line
+bindkey -M vicmd v edit-command-line
+# Makes backspace work after returning to insert mode
+bindkey '^?' backward-delete-char
+bindkey '^H' backward-delete-char
+bindkey '^W' backward-kill-word
+bindkey '^U' backward-kill-line
 
 # Colors and syntax highlighting
 HIGHLIGHTING_PLUGIN_PATH=/usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
@@ -63,17 +72,20 @@ else
 fi
 
 # Named directories
+hash -d b=~/.local/bin
+hash -d c=~/.config
 hash -d s=~/stuff
 hash -d S=~/stuff2
 hash -d ss=~/ssd
 hash -d d=~/drive
 hash -d p=~/projects
 hash -d t=~/stuff/torrents
-hash -d ufrj=~/projects/ufrj
+hash -d ufrj=~p/ufrj
+hash -d htb=~p/htb
 
 # Default options
 alias ls='ls -hF --color=auto'
-alias grep='grep --color=auto -nT'
+alias grep='grep --color=auto'
 alias mkdir='mkdir -pv'
 alias cp='cp -iv'
 alias mv='mv -iv'
@@ -86,6 +98,7 @@ alias zathura='zathura --fork'
 # Stop programs from spamming version/copyright info
 alias python='python -q'
 alias julia='julia -q'
+alias R='R -q'
 alias pwsh='pwsh -NoLogo'
 alias ffmpeg='ffmpeg -hide_banner'
 alias ffprobe='ffprobe -hide_banner'
@@ -97,9 +110,10 @@ alias lf='lf-ueberzug'
 # Shortcuts
 alias proj='fzf_cd_into_dir ~p'
 alias ufrj='fzf_cd_into_dir ~ufrj'
-alias lbin='fzf_edit_file_in_dir ~/.local/bin/'
-alias clipboard='xclip -selection clipboard'
-alias gef='gdb -q -ex "source /usr/share/gef/gef.py"'
+alias htb='fzf_cd_into_dir ~htb'
+alias lbin='fzf_edit_file_in_dir ~b'
+alias toclip='xclip -i -selection clipboard'
+alias fromclip='xclip -o -selection clipboard'
 
 # Functions
 fzf_cd_into_dir() {
@@ -107,5 +121,5 @@ fzf_cd_into_dir() {
 }
 
 fzf_edit_file_in_dir() {
-	"$EDITOR" "$1$(find "$1" -maxdepth 1 -type f | sed 's_.*/\(.*\)_\1_' | fzf)"
+	"$EDITOR" "$1/$(find "$1/" -maxdepth 1 -type f | sed 's_.*/\(.*\)_\1_' | fzf)"
 }
