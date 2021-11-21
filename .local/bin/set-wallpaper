@@ -21,7 +21,7 @@ case $# in
 		cp "$VERTICAL" "$XDG_CONFIG_HOME/wallpaper/v"
 		;;
 	*)
-		echo 'Usage: set-wallpaper HORIZONTAL VERTICAL'
+		echo 'Usage: set-wallpaper [HORIZONTAL] [VERTICAL]'
 		exit 1
 		;;
 esac
