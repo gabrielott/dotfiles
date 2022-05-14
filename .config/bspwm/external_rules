@@ -7,5 +7,5 @@ intermediate="$4"
 
 props="$(xprop -id "$win_id")"
 if echo "$props" | grep '_NET_WM_NAME.*main' >/dev/null 2>&1; then
-	echo 'layer=normal'
+	echo 'layer=normal desktop=DP-4^10'
 fi
