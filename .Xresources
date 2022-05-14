@@ -8,7 +8,7 @@ Xft.antialias: 1
 Xft.rgba: rgb
 
 ! Colors
-*.alpha:      0.85
+*.alpha:      0.9
 *.foreground: #ebdbb2
 *.background: #1d2021
 *.color0:     #282828
