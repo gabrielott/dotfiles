@@ -22,7 +22,7 @@ if soup.find(string="この番号に対応する作品が見つかりません�
     print("This RJ code doesn't seem to exist.")
     exit(1)
 
-title = soup.find("h1", id="work_name").a.text.strip()
+title = soup.find("h1", id="work_name").text.strip()
 cover = "https:" + soup.find("ul", class_="slider_items trans").li.img["srcset"]
 circle = soup.find("table", id="work_maker").tr.td.span.a.text.strip()
 outline = soup.find("table", id="work_outline")
