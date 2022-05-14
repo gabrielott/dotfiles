@@ -99,10 +99,12 @@ alias zathura='zathura --fork'
 alias python='python -q'
 alias julia='julia -q'
 alias R='R -q'
+alias swipl='swipl -q'
 alias pwsh='pwsh -NoLogo'
 alias ffmpeg='ffmpeg -hide_banner'
 alias ffprobe='ffprobe -hide_banner'
 alias gdb='gdb -q'
+alias maxima='maxima -q'
 
 # Start lf with custom script
 alias lf='lf-ueberzug'
@@ -114,6 +116,7 @@ alias htb='fzf_cd_into_dir ~htb'
 alias lbin='fzf_edit_file_in_dir ~b'
 alias toclip='xclip -i -selection clipboard'
 alias fromclip='xclip -o -selection clipboard'
+alias hl='highlight -O ansi'
 
 # Functions
 fzf_cd_into_dir() {
@@ -123,3 +126,6 @@ fzf_cd_into_dir() {
 fzf_edit_file_in_dir() {
 	"$EDITOR" "$1/$(find "$1/" -maxdepth 1 -type f | sed 's_.*/\(.*\)_\1_' | fzf)"
 }
+
+# Automatically start tmux if we're not already in tmux and not in tty1
+[ -z "${TMUX:-}" ] && [ "$(tty)" != '/dev/tty1' ] && exec tmux
