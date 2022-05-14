@@ -20,13 +20,19 @@ Plug 'sheerun/vim-polyglot'
 Plug 'jiangmiao/auto-pairs'
 Plug 'lervag/vimtex'
 Plug 'KeitaNakamura/tex-conceal.vim', {'for': 'tex'}
+" Plug 'vim-pandoc/vim-pandoc'
+Plug 'vim-pandoc/vim-pandoc-syntax'
+Plug 'kmonad/kmonad-vim'
 Plug 'arzg/vim-colors-xcode'
 Plug 'morhetz/gruvbox'
+Plug 'vimwiki/vimwiki'
 call plug#end()
 
+" auto-pairs
 let g:AutoPairsFlyMode = 1
 let g:AutoPairsShortcutBackInsert = '<C-b>'
 
+" vimtex
 let g:tex_flavor = 'latex'
 let g:vimtex_fold_enabled = 1
 let g:vimtex_compiler_method = 'latexmk'
@@ -39,6 +45,19 @@ let g:vimtex_compiler_latexmk = {
       \   '-shell-escape',
       \ ],
       \}
+
+" vimwiki
+let wiki = {}
+let wiki.path = '~/wiki/pages'
+let wiki.path_html = '~/wiki/html'
+let wiki.template_path = '~/wiki/templates'
+let wiki.template_default = 'mydefault'
+let wiki.auto_export = 1
+let wiki.auto_toc = 1
+let wiki.auto_tags = 1
+let wiki.links_space_char = '_'
+let g:vimwiki_list = [wiki]
+let g:vimwiki_folding = 'expr'
 
 let g:gruvbox_contrast_dark = 'hard'
 
@@ -75,7 +94,7 @@ syntax sync minlines=100
 set termguicolors
 set t_8f=[38;2;%lu;%lu;%lum
 set t_8b=[48;2;%lu;%lu;%lum
-colorscheme gruvbox
+colorscheme xcodedarkhc
 
 let mapleader = "\<Space>"
 let maplocalleader = "\<Space>"
