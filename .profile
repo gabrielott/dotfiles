@@ -33,9 +33,13 @@ export JULIA_DEPOT_PATH="$XDG_CONFIG_HOME/julia"
 export MAXIMA_USERDIR="$XDG_CONFIG_HOME/maxima"
 export GNUPGHOME="$XDG_CONFIG_HOME/gnupg"
 export LESSHISTFILE="$XDG_CONFIG_HOME/lesshst"
+export PARALLEL_HOME="$XDG_CONFIG_HOME/parallel"
+export STACK_ROOT="$XDG_DATA_HOME/stack"
 export __GL_SHADER_DISK_CACHE_PATH="$XDG_CACHE_HOME/nv/GLCache"
 export CUDA_CACHE_PATH="$XDG_CACHE_HOME/nv/ComputeCache"
-export SQLITE_HISTORY="$XDG_CACHE_HOME/sqlite/sqlite_history"
+export SQLITE_HISTORY="$XDG_CACHE_HOME/sqlite_history"
+export MYSQL_HISTFILE="$XDG_CACHE_HOME/mysql_history"
+export NODE_REPL_HISTORY="$XDG_CACHE_HOME/node_repl_history"
 
 PS1='[\u@\h \W]\$ '
 
