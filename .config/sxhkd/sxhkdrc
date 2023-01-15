@@ -84,9 +84,9 @@ super + Return
 super + space
 	dmenu_run
 
-# Open Firefox
+# Open browser
 super + f
-	firefox
+	$BROWSER
 
 # Open Anki & Migaku Dictionary
 super + a
@@ -229,8 +229,8 @@ super + {_,shift} + {1-9,0}
 	bspc {desktop --focus,node --to-desktop} focused:^{1-9,10}
 
 # Select special desktop
-super + {minus,equal}
-	bspc desktop --focus DP-0:^{11,12}
+super + {_,shift} + {minus,equal}
+	bspc {desktop --focus,node --to-desktop} DP-4:^{11,12}
 
 # Select monitor / move node to monitor
 super + {_,shift} + backslash
@@ -264,13 +264,13 @@ super + F4
 
 # mouse {{{
 
-# Next occupied desktop in focused monitor
+# Next occupied desktop in focused monitor (skipping ones starting with 隠)
 super + shift + control + alt + 1
-	bspc desktop --focus next.local.occupied
+	bspwm-cycle-desktop next
 
 # Previous occupied desktop in focused monitor
 super + shift + control + alt + 2
-	bspc desktop --focus prev.local.occupied
+	bspwm-cycle-desktop prev
 
 # Focus next monitor
 super + shift + control + alt + 3

@@ -1,0 +1,25 @@
+#!/bin/sh
+
+# Automatically mutes Genymotion when its window isn't on focus.
+
+pid="$(pidof -o %PPID -x "$0")"
+# shellcheck disable=SC2086
+[ -n "$pid" ] && kill $pid
+
+sink_number="$( \
+	pactl --format json list sink-inputs \
+	| jq '.[] | select(.["properties"]["application.name"] == "qemu").index' \
+)"
+
+xdo id -N 'Genymotion Player' -n 'player' | while read -r target_wid; do
+	if bspc query --nodes --node "$target_wid" > /dev/null; then
+		bspc subscribe node_focus | while read -r event; do
+			event_wid="$(echo "$event" | cut -d' ' -f4)"
+			if [ "$event_wid" = "$target_wid" ]; then
+				pactl set-sink-input-volume "$sink_number" 100%
+			else
+				pactl set-sink-input-volume "$sink_number" 0%
+			fi
+		done
+	fi
+done

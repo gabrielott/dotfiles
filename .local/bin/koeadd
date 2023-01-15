@@ -16,7 +16,7 @@ for dir in "$@"; do
 		continue
 	fi
 
-	code="$(echo "$dir" | grep -Eio 'RJ[0-9]{6}')"
+	code="$(echo "$dir" | grep -Eio 'RJ[0-9]{6,8}')"
 	if [ -z "$code" ]; then 
 		printf "Couldn't figure out RJ code from filename %s.\n" "$dir"
 		err=1
@@ -45,6 +45,7 @@ for dir in "$@"; do
 		}
 		END { print substr(out, 2, length(out) - 1) }
 	')"
+	formatted="$(printf '%s\t%s' "$formatted" "$(date '+%Y-%m-%d %H:%M')")"
 
 	code="$(echo "$formatted" | cut -f1)"
 	cover="$(echo "$formatted" | cut -f3)"
@@ -52,9 +53,9 @@ for dir in "$@"; do
 	find "$dir" -iregex '.*/.*\.\(wav\|aif\|aiff\)$' -exec toflac '{}' + -exec rm '{}' +
 	find "$dir" -iname '*.txt' -exec sh -c 'isutf8 "$0" || iconv -f shift_jis -t utf-8 -o "$0" "$0"' '{}' ';'
 
-	cd "$dir"
-	zip -0r "$KOE_DIR"/"$code".koe *
-	cd "$OLDPWD"
+	cd "$dir" || exit
+	zip -0r "$KOE_DIR"/"$code".koe ./*
+	cd "$OLDPWD" || exit
 	rm -r "$dir"
 
 	echo "$formatted" >> "$KOE_DIR"/db/db

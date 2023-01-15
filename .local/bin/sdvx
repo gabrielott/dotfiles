@@ -3,5 +3,5 @@
 # Runs unnamed-sdvx-clone
 
 USC_PATH=/opt/unnamed-sdvx-clone
-cd "$USC_PATH"
+cd "$USC_PATH" || exit
 exec ./usc-game

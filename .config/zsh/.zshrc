@@ -76,12 +76,14 @@ hash -d b=~/.local/bin
 hash -d c=~/.config
 hash -d s=~/stuff
 hash -d S=~/stuff2
-hash -d ss=~/ssd
+hash -d ss=~/stuff3
+hash -d ssd=~/ssd
 hash -d d=~/drive
 hash -d p=~/projects
 hash -d t=~/stuff/torrents
 hash -d ufrj=~p/ufrj
 hash -d htb=~p/htb
+hash -d w=/usr/share/seclists
 
 # Default options
 alias ls='ls -hF --color=auto'
@@ -97,6 +99,8 @@ alias zathura='zathura --fork'
 
 # Stop programs from spamming version/copyright info
 alias python='python -q'
+alias python2='python2 -q'
+alias python3='python3 -q'
 alias julia='julia -q'
 alias R='R -q'
 alias swipl='swipl -q'
@@ -117,14 +121,24 @@ alias lbin='fzf_edit_file_in_dir ~b'
 alias toclip='xclip -i -selection clipboard'
 alias fromclip='xclip -o -selection clipboard'
 alias hl='highlight -O ansi'
+alias fcd='fzf_cd_into_dir'
+alias fe='fzf_edit_file_in_dir'
+alias there='open_in_other_monitor'
 
 # Functions
 fzf_cd_into_dir() {
-	cd "$1/$(find "$1" -maxdepth 1 -type d | sed 's_.*/\(.*\)_\1_' | fzf)"
+	dir="${1:-.}"
+	cd "$dir/$(find "$dir" -mindepth 1 -maxdepth 1 -type d | sed 's_.*/\(.*\)_\1_' | fzf)"
 }
 
 fzf_edit_file_in_dir() {
-	"$EDITOR" "$1/$(find "$1/" -maxdepth 1 -type f | sed 's_.*/\(.*\)_\1_' | fzf)"
+	dir="${1:-.}"
+	"$EDITOR" "$dir/$(find "$dir/" -mindepth 1 -maxdepth 1 -type f | sed 's_.*/\(.*\)_\1_' | fzf)"
+}
+
+open_in_other_monitor() {
+	bspc desktop --focus next:focused
+	"${@:?'Missing command'}"
 }
 
 # Automatically start tmux if we're not already in tmux and not in tty1

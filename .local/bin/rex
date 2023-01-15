@@ -9,7 +9,7 @@
 [ "$1" = '-f' ] && { force=1; shift; }
 [ $# -ge 2 ] || { echo 'Usage: rex [-f] file [file] [...] [file] new_extension'; exit 1; }
 
-eval ext=\${$#}
+eval ext='${'$#'}'
 while [ $# -gt 1 ]; do
 	if ! [ -e "$1" ]; then
 		err=1
@@ -18,9 +18,10 @@ while [ $# -gt 1 ]; do
 		continue
 	fi
 
+	# shellcheck disable=SC2154
 	new="$(dirname "$1")"/"$(ext -n "$1")"."$ext"
 
-	if [ -e "$new" -a "$force" != 1 ]; then
+	if [ -e "$new" ] && [ "$force" != 1 ]; then
 		err=1
 		printf "File %s already exists.\n" "$new"
 		shift

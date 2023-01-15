@@ -1,0 +1,26 @@
+#!/usr/bin/env python3
+
+# Converts each line of a file to base64 separately.
+# Nice to use with ffuf: lines2b64 my_list.txt | ffuf -w - -u https://something.com
+# 
+# This was written in Python because I couldn't find a way to do it in a shell script
+# that didn't spawn a new base64 process for each line, which made it unnacceptably slow.
+
+import base64
+import argparse
+import sys
+
+parser = argparse.ArgumentParser()
+parser.add_argument("files", nargs="*")
+args = parser.parse_args()
+
+if not args.files:
+    args.files = ["/dev/stdin"]
+
+for path in args.files:
+    with open(path, "rt") as f:
+        for line in f:
+            line = line[:-1]
+            b64 = base64.b64encode(line.encode("utf-8")).decode("utf-8")
+            print(b64)
+

@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# Starts alproxy. Meant to be run as a systemd service.
+
+TCPPROXY_PATH=/home/gabriel/projects/alhacking/tcpproxy
+SERVER_DOMAIN=blhxjpgs4api.azurlane.jp
+
+cd "$TCPPROXY_PATH" || exit 1
+
+# I'm forcing dig to use 1.1.1.1 because I want to bypass /etc/hosts.
+# I guess this also kind of assumes the domain resolves to ipv4, which I'm ok with.
+server_ip="$(dig @1.1.1.1 +short "$SERVER_DOMAIN" | grep -m1 '^[[:digit:]]')"
+
+exec ./tcpproxy.py -lp 80 -ti "$server_ip" -tp 80 -om alwatch -im alwatch

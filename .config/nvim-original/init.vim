@@ -4,17 +4,16 @@
 "   \_/ |_|_| |_| |_|_|  \___|
 
 " Autoinstall vim-plug
-if empty(glob('~/.vim/autoload/plug.vim'))
-  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
-    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
-endif
+" if empty(glob('~/.vim/autoload/plug.vim'))
+"   silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+"     \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+"   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+" endif
 
 call plug#begin('~/.vim/plugged')
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-commentary'
-Plug 'tpope/vim-apathy'
 Plug 'sheerun/vim-polyglot'
 " Plug 'psliwka/vim-smoothie'
 Plug 'jiangmiao/auto-pairs'
@@ -22,11 +21,9 @@ Plug 'lervag/vimtex'
 Plug 'KeitaNakamura/tex-conceal.vim', {'for': 'tex'}
 " Plug 'vim-pandoc/vim-pandoc'
 Plug 'vim-pandoc/vim-pandoc-syntax'
-Plug 'kmonad/kmonad-vim'
 Plug 'arzg/vim-colors-xcode'
 Plug 'morhetz/gruvbox'
 Plug 'vimwiki/vimwiki'
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
 call plug#end()
 
 " auto-pairs
@@ -64,26 +61,19 @@ let g:vimwiki_valid_html_tags = 'b,i,s,u,sub,sup,kbd,br,hr,details,summary'
 
 let g:gruvbox_contrast_dark = 'hard'
 
-set encoding=utf-8
 set fileencodings=ucs-bom,uft-8,default,sjis
 set number
 set relativenumber
-set autoindent
-set ruler
 set cursorline
-set showcmd
-set incsearch
+set nohlsearch
 set ignorecase
 set smartcase
-set hidden
-set wildmenu
 set scrolloff=3
 set tabstop=4 softtabstop=4 shiftwidth=4
 set listchars=eol:¬,tab:>·,trail:~,extends:>,precedes:<,space:␣
 set foldmethod=indent
 set foldnestmax=2
 set conceallevel=2
-set background=dark
 
 " Fix Ctrl-[ O delay
 " :h vt100-cursor-keys
@@ -91,7 +81,6 @@ set notimeout
 set ttimeout
 set timeoutlen=100
 filetype plugin indent on
-syntax on
 syntax sync minlines=100
 " Fix colors
 set termguicolors
@@ -130,9 +119,12 @@ nnoremap gj j
 nnoremap gk k
 
 " Miscellaneous
-nnoremap <Leader>. :e ~/.vimrc<CR>     " Open this file
+nnoremap <Leader>. :e ~/.config/nvim/init.vim<CR>     " Open this file
 nnoremap <Leader>R :!lf<CR><CR>        " Run lf
 nnoremap <Leader>= mzgg=G`z            " Auto indent entire file
 cnoremap w!! w !sudo tee > /dev/null %
 
-autocmd BufWritePost .vimrc source %
+augroup highlight_yank
+	autocmd!
+	au TextYankPost * silent! lua vim.highlight.on_yank{timeout=700}
+augroup END

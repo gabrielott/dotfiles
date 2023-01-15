@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# byecr - Bye, carriage return
+# Converts text with lines terminated by \r\n into \n
+
+sed $'s_\r$__' "${1:-/dev/stdin}"

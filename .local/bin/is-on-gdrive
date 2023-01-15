@@ -5,7 +5,7 @@
 
 while [ $# -gt 0 ]; do
 	[ -e "$1" ] || { shift; continue; }
-	echo "$(realpath "$1")" | grep '^/media/drive' > /dev/null 2>&1 && exit 0
+	realpath "$1" | grep '^/media/drive' > /dev/null 2>&1 && exit 0
 	shift
 done
 

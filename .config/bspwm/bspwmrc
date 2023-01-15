@@ -5,8 +5,8 @@ H=DP-4
 # Vertical monitor
 V=DP-0
 
-bspc monitor $H --reset-desktops 一 二 三 四 五 六 七 八 九 十
-bspc monitor $V --reset-desktops 一 二 三 四 五 六 七 八 九 十 辞 暗 ア
+bspc monitor $H --reset-desktops 一 二 三 四 五 六 七 八 九 十 隠一 隠二
+bspc monitor $V --reset-desktops 一 二 三 四 五 六 七 八 九 十 ア
 
 bspc config border_width 5
 bspc config window_gap 0

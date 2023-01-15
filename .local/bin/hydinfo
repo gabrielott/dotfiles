@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# Hydrus is only available locally, so putting this here is ok.
+HYDRUS_KEY='48922431795abe53336862f377af5ec45a4cebe12318b609d572dc8873dc8787'
+
+hashes="$(sha256sum "${@:?'No files given'}" | jq -Rnc '[inputs | split("  ")[0]]')"
+
+curl \
+	-Gs \
+	-H "Hydrus-Client-API-Access-Key: $HYDRUS_KEY" \
+	--data-urlencode "hashes=$hashes" \
+	'http://127.0.0.1:45869/get_files/file_metadata' \
+	| jq '
+		.metadata[] | {
+			size: .size,
+			mime: .mime,
+			inbox: .is_inbox,
+			# tags: .service_names_to_statuses_to_display_tags."all known tags"."0"
+		}
+	'

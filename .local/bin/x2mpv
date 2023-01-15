@@ -1,0 +1,15 @@
+#!/bin/sh
+
+winid="$(xwininfo | sed -n 's_.*Window id: \(0x[[:xdigit:]]*\).*_\1_p')"
+
+ffmpeg \
+	-hide_banner \
+	-f x11grab \
+	-window_id "$winid" \
+	-framerate 60 \
+	-i :0.0 \
+	-c:v libx264 \
+	-preset medium \
+	-tune zerolatency \
+	-f matroska \
+	- | mpv --profile=low-latency -

@@ -1,0 +1,24 @@
+#!/bin/sh
+
+# Changes the focus to the next or previous desktop, but skipping
+# ones whose name contains 隠.
+
+direction="$1"
+if [ "$direction" != next ] && [ "$direction" != prev ]; then
+	echo 'Invalid direction, should be "next" or "prev".'
+	exit 1
+fi
+
+current_monitor="$(bspc query --monitors --monitor focused --names)"
+
+if [ "$current_monitor" != DP-4 ]; then
+	bspc desktop --focus "$direction".local.occupied
+	exit
+fi
+
+target_desktop="$(bspc query --desktops --desktop "$direction".local.occupied --names)"
+while echo "$target_desktop" | grep '隠' >/dev/null 2>&1; do
+	target_desktop="$(bspc query --desktops "$target_desktop" --desktop "$direction".local.occupied --names)"
+done
+
+bspc desktop --focus "$target_desktop"

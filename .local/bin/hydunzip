@@ -1,0 +1,98 @@
+#!/bin/sh
+
+# Hydrus is only available locally, so putting this here is ok.
+HYDRUS_KEY='48922431795abe53336862f377af5ec45a4cebe12318b609d572dc8873dc8787'
+
+filter="$1"
+
+tempdir="$(mktemp -d)"
+cd "$tempdir" || exit
+
+files="$(
+	curl \
+		-Gs \
+		-H "Hydrus-Client-API-Access-Key: $HYDRUS_KEY" \
+		--data-urlencode 'tags=["system:inbox", "system:filetype = zip, application/vnd.rar", "'"$filter"'"]' \
+		'http://127.0.0.1:45869/get_files/search_files' \
+	| jq -c '.file_ids'
+)"
+
+metadata="$(
+	curl \
+		-Gs \
+		-H "Hydrus-Client-API-Access-Key: $HYDRUS_KEY" \
+		--data-urlencode "file_ids=$files" \
+		'http://127.0.0.1:45869/get_files/file_metadata'
+)"
+
+for file in $(echo "$files" | jq '.[]'); do
+	curl \
+		-GJOs \
+		-H "Hydrus-Client-API-Access-Key: $HYDRUS_KEY" \
+		--data-urlencode "file_id=$file" \
+		'http://127.0.0.1:45869/get_files/file'
+done
+
+# shellcheck disable=SC2046
+parallel --bar unar -d '{}' \
+	::: $(echo "$metadata" | jq -r '.metadata[] | "\(.hash)\(.ext)"')
+
+find . -iregex '.*\.\(psd\|rsrc\|txt\|clip\)$' -exec rm '{}' +
+
+status=''
+for directory in $(echo "$metadata" | jq -r '.metadata[].hash'); do
+	current="$(
+		find "$directory" -type f -exec \
+			curl \
+				-s \
+				-H "Hydrus-Client-API-Access-Key: $HYDRUS_KEY" \
+				-H 'Content-Type: application/octet-stream' \
+				--data-binary '@{}' \
+				'http://127.0.0.1:45869/add_files/add_file' \
+			';' \
+			| jq -r '"\(.status)\t\(.hash)\t\(.note)"'
+	)"
+
+	status="$status$current"
+
+	current_success="$(echo "$current" | grep '^1' | cut -f2 | jq -Rnc '[inputs]')"
+	[ "$current_success" = '[]' ] && continue
+
+	json="$(echo "$metadata" | jq '
+		.metadata[] | select(.hash == "'"$directory"'")
+		| {
+			"hashes": '"$current_success"',
+			"service_names_to_tags": {"my tags": .["tags"]["6c6f63616c2074616773"]["storage_tags"]["0"]}
+		}
+	')"
+
+	curl \
+		-s \
+		-H "Hydrus-Client-API-Access-Key: $HYDRUS_KEY" \
+		-H 'Content-Type: application/json' \
+		--data "$json" \
+		'http://127.0.0.1:45869/add_tags/add_tags' \
+	| jq -r '.pages.pages[0].pages[1].page_key'
+
+done
+
+echo "$status" | grep -v '^1'
+success_hashes="$(echo "$status" | grep '^1' | cut -f2 | jq -Rnc '[inputs]')"
+[ "$success_hashes" = '[]' ] && exit 1
+
+page_key="$(
+	curl \
+		-s \
+		-H "Hydrus-Client-API-Access-Key: $HYDRUS_KEY" \
+		'http://127.0.0.1:45869/manage_pages/get_pages' \
+	| jq -r '.pages.pages[0].pages[1].page_key'
+)"
+
+curl \
+	-s \
+	-H "Hydrus-Client-API-Access-Key: $HYDRUS_KEY" \
+	-H 'Content-Type: application/json' \
+	--data '{"page_key":"'"$page_key"'","hashes":'"$success_hashes"'}' \
+	'http://127.0.0.1:45869/manage_pages/add_files'
+
+rm -rf "$tempdir"
